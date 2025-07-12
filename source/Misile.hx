@@ -22,6 +22,7 @@ class Misile extends FlxSprite {
     public function launch(power:Int, angle:Int, radiusExplosion:Int, _x:Float, _y:Float) {
         x = _x;
         y = _y;
+        visible = true;
         
         _radius = radiusExplosion;
         
@@ -30,7 +31,7 @@ class Misile extends FlxSprite {
         acceleration.set(0, 800);
         moving = true;
     }
-
+    // TODO: Bouncing in the walls
     function parable() {
         if (FlxCollision.pixelPerfectCheck(this, playstate.ground)) {
             cast(FlxG.state, PlayState).explode(_radius);
@@ -38,9 +39,12 @@ class Misile extends FlxSprite {
             velocity.set(0, 0);
             acceleration.y = 0;
         }
+        
+        if (FlxCollision.pixelPerfectCheck(this, playstate.leftWall) || FlxCollision.pixelPerfectCheck(this, playstate.rightWall)) {
+            velocity.x *= -1;
+        }
     }
 
-    // TODO: Actually exploding
     /*function explode(radius:Int) {
         velocity.x = velocity.y = 0;
         var diameter = radius*2;

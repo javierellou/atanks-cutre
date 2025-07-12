@@ -21,7 +21,7 @@ class Player extends FlxSprite {
     public function new(x:Float, y:Float) {
         super(x, y);
 
-        makeGraphic(40, 25, FlxColor.GREEN);
+        makeGraphic(35, 18, FlxColor.GREEN);
     }
 
     function ajustAndSend() {
@@ -49,7 +49,6 @@ class Player extends FlxSprite {
 
         if (fire) {
             cast(FlxG.state, PlayState).triggerLaunch(powerAdjust, angleAdjust);
-            trace("space pressed");
         }
     }
 

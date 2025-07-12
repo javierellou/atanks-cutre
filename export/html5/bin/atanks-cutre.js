@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "50";
+	app.meta.h["build"] = "2";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -7536,6 +7536,7 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 	,launch: function(power,angle,radiusExplosion,_x,_y) {
 		this.set_x(_x);
 		this.set_y(_y);
+		this.set_visible(true);
 		this._radius = radiusExplosion;
 		var SPEED = power;
 		var this1 = this.velocity;
@@ -7578,6 +7579,9 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 			this1.set_x(x);
 			this1.set_y(y);
 			this.acceleration.set_y(0);
+		}
+		if(flixel_util_FlxCollision.pixelPerfectCheck(this,this.playstate.leftWall) || flixel_util_FlxCollision.pixelPerfectCheck(this,this.playstate.rightWall)) {
+			this.velocity.set_x(this.velocity.x * -1);
 		}
 	}
 	,update: function(elapsed) {
@@ -8337,54 +8341,82 @@ flixel_FlxState.prototype = $extend(flixel_group_FlxTypedContainer.prototype,{
 	,__properties__: $extend(flixel_group_FlxTypedContainer.prototype.__properties__,{get_subStateClosed:"get_subStateClosed",get_subStateOpened:"get_subStateOpened",set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
 });
 var PlayState = function() {
+	this.turn = "P1";
 	flixel_FlxState.call(this);
 };
 $hxClasses["PlayState"] = PlayState;
 PlayState.__name__ = "PlayState";
 PlayState.__super__ = flixel_FlxState;
 PlayState.prototype = $extend(flixel_FlxState.prototype,{
-	player: null
+	turn: null
+	,player: null
+	,player2: null
 	,ground: null
 	,misile: null
 	,explosionSprite: null
+	,indicator: null
+	,rightWall: null
+	,leftWall: null
 	,textPower: null
 	,textAngle: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
-		this.player = new Player(50,240);
+		this.player = new Player(50,252);
+		this.player = new Player2(100,250);
 		this.ground = new Ground(0,270);
 		this.misile = new Misile();
-		this.explosionSprite = new flixel_FlxSprite(-50,-50);
-		this.explosionSprite.makeGraphic(0,0,-23296);
+		this.explosionSprite = new flixel_FlxSprite(this.player.x,this.player.y);
+		this.explosionSprite.set_visible(false);
+		this.explosionSprite.makeGraphic(10,10,-23296);
 		this.textPower = new flixel_text_FlxText(10,10,300,"Power: 0");
 		this.textAngle = new flixel_text_FlxText(10,30,300,"Angle: 0");
 		this.textPower.set_color(this.textAngle.set_color(-1));
+		this.indicator = new flixel_FlxSprite(this.player.x,this.player.y - 20);
+		this.indicator.makeGraphic(8,40,-16744448);
+		this.rightWall = new flixel_FlxSprite(flixel_FlxG.width - 10,flixel_FlxG.height - 1000);
+		this.rightWall.makeGraphic(10,1000,-16744448);
+		this.leftWall = new flixel_FlxSprite(0,flixel_FlxG.height - 1000);
+		this.leftWall.makeGraphic(10,1000,-16744448);
 		this.add(this.player);
+		this.add(this.player2);
 		this.add(this.ground);
 		this.add(this.misile);
 		this.add(this.explosionSprite);
+		this.add(this.indicator);
+		this.add(this.rightWall);
+		this.add(this.leftWall);
 		this.add(this.textAngle);
 		this.add(this.textPower);
 	}
 	,triggerLaunch: function(_power,_angle) {
-		haxe_Log.trace("Power: " + _power,{ fileName : "source/PlayState.hx", lineNumber : 43, className : "PlayState", methodName : "triggerLaunch"});
 		this.misile.launch(_power,_angle,10,this.player.x,this.player.y);
+		this.turn = this.turn == "P2" ? "i1" : "i2";
 	}
 	,updateText: function() {
 		this.textPower.set_text("Power: " + Std.string(this.player.powerAdjust));
 		this.textAngle.set_text("Angle: " + Std.string(this.player.angleAdjust));
 	}
 	,explode: function(radius) {
+		var _gthis = this;
 		this.misile.velocity.set_x(this.misile.velocity.set_y(0));
 		var diameter = radius * 2;
 		this.explosionSprite.setGraphicSize(diameter,diameter);
-		this.explosionSprite.set_x(this.misile.x - radius);
+		this.explosionSprite.set_x(this.misile.x - radius / 2);
+		this.explosionSprite.set_y(this.misile.y - radius / 2);
+		this.explosionSprite.set_visible(true);
+		haxe_Timer.delay(function() {
+			_gthis.explosionSprite.set_visible(false);
+			_gthis.misile.set_visible(false);
+			_gthis.turn = _gthis.turn == "i1" ? "P1" : "P2";
+		},2000);
+	}
+	,updateIndicator: function() {
+		this.indicator.set_angle(this.player.angleAdjust * -1 + 90);
 	}
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
 		this.updateText();
-		haxe_Log.trace("X: " + this.misile.x,{ fileName : "source/PlayState.hx", lineNumber : 68, className : "PlayState", methodName : "update"});
-		haxe_Log.trace("Y: " + this.misile.y,{ fileName : "source/PlayState.hx", lineNumber : 69, className : "PlayState", methodName : "update"});
+		this.updateIndicator();
 	}
 	,__class__: PlayState
 });
@@ -8397,7 +8429,7 @@ var Player = function(x,y) {
 	this.decreaseAngle = false;
 	this.increaseAngle = false;
 	flixel_FlxSprite.call(this,x,y);
-	this.makeGraphic(40,25,-16744448);
+	this.makeGraphic(35,18,-16744448);
 };
 $hxClasses["Player"] = Player;
 Player.__name__ = "Player";
@@ -8435,7 +8467,6 @@ Player.prototype = $extend(flixel_FlxSprite.prototype,{
 		}
 		if(this.fire) {
 			(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).triggerLaunch(this.powerAdjust,this.angleAdjust);
-			haxe_Log.trace("space pressed",{ fileName : "source/Player.hx", lineNumber : 52, className : "Player", methodName : "ajustAndSend"});
 		}
 	}
 	,update: function(elapsed) {
@@ -8443,6 +8474,56 @@ Player.prototype = $extend(flixel_FlxSprite.prototype,{
 		this.ajustAndSend();
 	}
 	,__class__: Player
+});
+var Player2 = function(x,y) {
+	this.powerAdjust2 = 1000;
+	this.angleAdjust2 = 90;
+	this.fire2 = false;
+	this.decreasePower2 = false;
+	this.increasePower2 = false;
+	this.decreaseAngle2 = false;
+	this.increaseAngle2 = false;
+	Player.call(this,x,y);
+};
+$hxClasses["Player2"] = Player2;
+Player2.__name__ = "Player2";
+Player2.__super__ = Player;
+Player2.prototype = $extend(Player.prototype,{
+	increaseAngle2: null
+	,decreaseAngle2: null
+	,increasePower2: null
+	,decreasePower2: null
+	,fire2: null
+	,angleAdjust2: null
+	,powerAdjust2: null
+	,ajustAndSend: function() {
+		var _this = flixel_FlxG.keys.pressed;
+		this.increaseAngle2 = _this.keyManager.checkStatusUnsafe(37,_this.status);
+		var _this = flixel_FlxG.keys.pressed;
+		this.decreaseAngle2 = _this.keyManager.checkStatusUnsafe(39,_this.status);
+		var _this = flixel_FlxG.keys.pressed;
+		this.increasePower2 = _this.keyManager.checkStatusUnsafe(38,_this.status);
+		var _this = flixel_FlxG.keys.pressed;
+		this.decreasePower2 = _this.keyManager.checkStatusUnsafe(40,_this.status);
+		var _this = flixel_FlxG.keys.pressed;
+		this.fire2 = _this.keyManager.checkStatusUnsafe(32,_this.status);
+		if(this.increaseAngle2 && (0 <= this.angleAdjust2 && this.angleAdjust2 <= 180)) {
+			this.angleAdjust2++;
+		}
+		if(this.increasePower2 && (0 <= this.powerAdjust2 && this.powerAdjust2 <= 2000)) {
+			this.powerAdjust2 += 15;
+		}
+		if(this.decreaseAngle2 && (0 <= this.angleAdjust2 && this.angleAdjust2 <= 180)) {
+			this.angleAdjust2--;
+		}
+		if(this.decreasePower2 && (0 <= this.powerAdjust2 && this.powerAdjust2 <= 2000)) {
+			this.powerAdjust2 -= 15;
+		}
+		if(this.fire2) {
+			(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).triggerLaunch(this.powerAdjust2,this.angleAdjust2);
+		}
+	}
+	,__class__: Player2
 });
 var Reflect = function() { };
 $hxClasses["Reflect"] = Reflect;
@@ -75941,7 +76022,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 599501;
+	this.version = 694470;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
