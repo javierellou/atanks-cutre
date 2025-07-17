@@ -7,6 +7,7 @@ import flixel.FlxSprite;
 import flixel.FlxG;
 import haxe.Timer;
 
+// TODO: Add Sprites and all that stuff
 class PlayState extends FlxState
 {
 	// TODO: Make the turn system work
@@ -15,15 +16,18 @@ class PlayState extends FlxState
 	 	"P2": Player two's turn
 		"i1": Intermission and P1 next
 		"i2": Intermission and P2 next
-	*/
+    */
 
 	var player:Player;
 	var player2:Player2;
+
 	@:allow(Misile)
 	var ground:Ground;
 	var misile:Misile;
 	var explosionSprite:FlxSprite;
+
 	var indicator:FlxSprite;
+	var indicator2:FlxSprite;
 
 	@:allow(Misile)
 	var rightWall:FlxSprite;
@@ -38,7 +42,7 @@ class PlayState extends FlxState
 		super.create();
 
 		player = new Player(50, 252);
-		player = new Player2(100, 250);
+		player2 = new Player2(600, 250);
 
 		ground = new Ground(0, 270);
 		misile = new Misile();
@@ -50,8 +54,11 @@ class PlayState extends FlxState
 		textAngle = new FlxText(10, 30, 300, "Angle: 0");
 		textPower.color = textAngle.color = FlxColor.WHITE;
 
-		indicator = new FlxSprite(player.x, player.y - 20);
+		indicator = new FlxSprite(player.x + player.width/2, player.y - 20);
 		indicator.makeGraphic(8, 40, FlxColor.GREEN);
+
+		indicator2 = new FlxSprite(player2.x + player2.width/2, player2.y - 20);
+		indicator2.makeGraphic(8, 40, FlxColor.RED);
 
 		rightWall = new FlxSprite(FlxG.width - 10, FlxG.height - 1000);
 		rightWall.makeGraphic(10, 1000, FlxColor.GREEN);
@@ -64,7 +71,9 @@ class PlayState extends FlxState
 		add(ground);
 		add(misile);
 		add(explosionSprite);
+
 		add(indicator);
+		add(indicator2);
 
 		add(rightWall);
 		add(leftWall);
@@ -74,13 +83,20 @@ class PlayState extends FlxState
 	}
 
 	public function triggerLaunch(_power:Int, _angle:Int) {
-		misile.launch(_power, _angle, 10, player.x, player.y);
+		var xpos:Float = (turn == "P1") ? player.x + player.width/2: player2.x + player.width/2;
+		var ypos:Float = (turn == "P1") ? player.y : player2.y;
+		misile.launch(_power, _angle, 10, xpos, ypos);
 		turn = (turn == "P2") ? "i1" : "i2";
 	}
 
 	function updateText() {
-		textPower.text = "Power: " + Std.string(player.powerAdjust);
-		textAngle.text = "Angle: " + Std.string(player.angleAdjust);
+		if (turn == "P1") {
+			textPower.text = "Power: " + Std.string(player.powerAdjust);
+			textAngle.text = "Angle: " + Std.string(player.angleAdjust);
+		} else if (turn == "P2") {
+			textPower.text = "Power: " + Std.string(player2.powerAdjust2);
+			textAngle.text = "Angle: " + Std.string(player2.angleAdjust2);
+		}
 	}
 
 	public function explode(radius:Int) {
@@ -100,7 +116,8 @@ class PlayState extends FlxState
 
 	// Update the angle of the indicator
 	function updateIndicator() {
-		indicator.angle = player.angleAdjust * -1 + 90; // TODO: Fis this
+		indicator.angle = player.angleAdjust * -1 + 90;
+		indicator2.angle = player2.angleAdjust2 * -1 + 90;
 	}
 
 	override public function update(elapsed:Float)

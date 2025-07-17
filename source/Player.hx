@@ -6,6 +6,7 @@ import flixel.FlxSprite;
 import PlayState;
 
 class Player extends FlxSprite {
+    var playstate:PlayState = cast flixel.FlxG.state;
     var increaseAngle:Bool = false;
     var decreaseAngle:Bool = false;
     
@@ -31,29 +32,33 @@ class Player extends FlxSprite {
         decreasePower = FlxG.keys.pressed.DOWN;
         fire = FlxG.keys.pressed.SPACE;
 
-        if (increaseAngle && (0 <= angleAdjust && angleAdjust <= 180)) {
-            angleAdjust++;
-        }
+        if (playstate.turn == "P1") {
+            if (increaseAngle && (0 <= angleAdjust && angleAdjust <= 180)) {
+                angleAdjust++;
+            }
 
-        if (increasePower && (0 <= powerAdjust && powerAdjust <= 2000)) {
-            powerAdjust += 15;
-        }
+            if (increasePower && (0 <= powerAdjust && powerAdjust <= 2000)) {
+                powerAdjust += 15;
+            }
 
-        if (decreaseAngle && (0 <= angleAdjust && angleAdjust <= 180)) {
-            angleAdjust--;
-        }
+            if (decreaseAngle && (0 <= angleAdjust && angleAdjust <= 180)) {
+                angleAdjust--;
+            }
 
-        if (decreasePower && (0 <= powerAdjust && powerAdjust <= 2000)) {
-            powerAdjust -= 15;
-        }
+            if (decreasePower && (0 <= powerAdjust && powerAdjust <= 2000)) {
+                powerAdjust -= 15;
+            }
 
-        if (fire) {
-            cast(FlxG.state, PlayState).triggerLaunch(powerAdjust, angleAdjust);
+            if (fire) {
+                cast(FlxG.state, PlayState).triggerLaunch(powerAdjust, angleAdjust);
+            }
         }
+        
     }
 
     override function update(elapsed:Float) {
         super.update(elapsed);
         ajustAndSend();
+        trace(playstate.turn);
     }
 }

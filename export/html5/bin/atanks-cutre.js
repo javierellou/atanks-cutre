@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "2";
+	app.meta.h["build"] = "3";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -8355,6 +8355,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,misile: null
 	,explosionSprite: null
 	,indicator: null
+	,indicator2: null
 	,rightWall: null
 	,leftWall: null
 	,textPower: null
@@ -8362,7 +8363,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
 		this.player = new Player(50,252);
-		this.player = new Player2(100,250);
+		this.player2 = new Player2(600,250);
 		this.ground = new Ground(0,270);
 		this.misile = new Misile();
 		this.explosionSprite = new flixel_FlxSprite(this.player.x,this.player.y);
@@ -8371,8 +8372,10 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.textPower = new flixel_text_FlxText(10,10,300,"Power: 0");
 		this.textAngle = new flixel_text_FlxText(10,30,300,"Angle: 0");
 		this.textPower.set_color(this.textAngle.set_color(-1));
-		this.indicator = new flixel_FlxSprite(this.player.x,this.player.y - 20);
+		this.indicator = new flixel_FlxSprite(this.player.x + this.player.get_width() / 2,this.player.y - 20);
 		this.indicator.makeGraphic(8,40,-16744448);
+		this.indicator2 = new flixel_FlxSprite(this.player2.x + this.player2.get_width() / 2,this.player2.y - 20);
+		this.indicator2.makeGraphic(8,40,-65536);
 		this.rightWall = new flixel_FlxSprite(flixel_FlxG.width - 10,flixel_FlxG.height - 1000);
 		this.rightWall.makeGraphic(10,1000,-16744448);
 		this.leftWall = new flixel_FlxSprite(0,flixel_FlxG.height - 1000);
@@ -8383,18 +8386,26 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.misile);
 		this.add(this.explosionSprite);
 		this.add(this.indicator);
+		this.add(this.indicator2);
 		this.add(this.rightWall);
 		this.add(this.leftWall);
 		this.add(this.textAngle);
 		this.add(this.textPower);
 	}
 	,triggerLaunch: function(_power,_angle) {
-		this.misile.launch(_power,_angle,10,this.player.x,this.player.y);
+		var xpos = this.turn == "P1" ? this.player.x + this.player.get_width() / 2 : this.player2.x + this.player.get_width() / 2;
+		var ypos = this.turn == "P1" ? this.player.y : this.player2.y;
+		this.misile.launch(_power,_angle,10,xpos,ypos);
 		this.turn = this.turn == "P2" ? "i1" : "i2";
 	}
 	,updateText: function() {
-		this.textPower.set_text("Power: " + Std.string(this.player.powerAdjust));
-		this.textAngle.set_text("Angle: " + Std.string(this.player.angleAdjust));
+		if(this.turn == "P1") {
+			this.textPower.set_text("Power: " + Std.string(this.player.powerAdjust));
+			this.textAngle.set_text("Angle: " + Std.string(this.player.angleAdjust));
+		} else if(this.turn == "P2") {
+			this.textPower.set_text("Power: " + Std.string(this.player2.powerAdjust2));
+			this.textAngle.set_text("Angle: " + Std.string(this.player2.angleAdjust2));
+		}
 	}
 	,explode: function(radius) {
 		var _gthis = this;
@@ -8412,6 +8423,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,updateIndicator: function() {
 		this.indicator.set_angle(this.player.angleAdjust * -1 + 90);
+		this.indicator2.set_angle(this.player2.angleAdjust2 * -1 + 90);
 	}
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
@@ -8428,6 +8440,7 @@ var Player = function(x,y) {
 	this.increasePower = false;
 	this.decreaseAngle = false;
 	this.increaseAngle = false;
+	this.playstate = flixel_FlxG.game._state;
 	flixel_FlxSprite.call(this,x,y);
 	this.makeGraphic(35,18,-16744448);
 };
@@ -8435,7 +8448,8 @@ $hxClasses["Player"] = Player;
 Player.__name__ = "Player";
 Player.__super__ = flixel_FlxSprite;
 Player.prototype = $extend(flixel_FlxSprite.prototype,{
-	increaseAngle: null
+	playstate: null
+	,increaseAngle: null
 	,decreaseAngle: null
 	,increasePower: null
 	,decreasePower: null
@@ -8453,25 +8467,28 @@ Player.prototype = $extend(flixel_FlxSprite.prototype,{
 		this.decreasePower = _this.keyManager.checkStatusUnsafe(40,_this.status);
 		var _this = flixel_FlxG.keys.pressed;
 		this.fire = _this.keyManager.checkStatusUnsafe(32,_this.status);
-		if(this.increaseAngle && (0 <= this.angleAdjust && this.angleAdjust <= 180)) {
-			this.angleAdjust++;
-		}
-		if(this.increasePower && (0 <= this.powerAdjust && this.powerAdjust <= 2000)) {
-			this.powerAdjust += 15;
-		}
-		if(this.decreaseAngle && (0 <= this.angleAdjust && this.angleAdjust <= 180)) {
-			this.angleAdjust--;
-		}
-		if(this.decreasePower && (0 <= this.powerAdjust && this.powerAdjust <= 2000)) {
-			this.powerAdjust -= 15;
-		}
-		if(this.fire) {
-			(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).triggerLaunch(this.powerAdjust,this.angleAdjust);
+		if(this.playstate.turn == "P1") {
+			if(this.increaseAngle && (0 <= this.angleAdjust && this.angleAdjust <= 180)) {
+				this.angleAdjust++;
+			}
+			if(this.increasePower && (0 <= this.powerAdjust && this.powerAdjust <= 2000)) {
+				this.powerAdjust += 15;
+			}
+			if(this.decreaseAngle && (0 <= this.angleAdjust && this.angleAdjust <= 180)) {
+				this.angleAdjust--;
+			}
+			if(this.decreasePower && (0 <= this.powerAdjust && this.powerAdjust <= 2000)) {
+				this.powerAdjust -= 15;
+			}
+			if(this.fire) {
+				(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).triggerLaunch(this.powerAdjust,this.angleAdjust);
+			}
 		}
 	}
 	,update: function(elapsed) {
 		flixel_FlxSprite.prototype.update.call(this,elapsed);
 		this.ajustAndSend();
+		haxe_Log.trace(this.playstate.turn,{ fileName : "source/Player.hx", lineNumber : 62, className : "Player", methodName : "update"});
 	}
 	,__class__: Player
 });
@@ -8483,20 +8500,23 @@ var Player2 = function(x,y) {
 	this.increasePower2 = false;
 	this.decreaseAngle2 = false;
 	this.increaseAngle2 = false;
-	Player.call(this,x,y);
+	this.playstate = flixel_FlxG.game._state;
+	flixel_FlxSprite.call(this,x,y);
+	this.makeGraphic(35,18,-65536);
 };
 $hxClasses["Player2"] = Player2;
 Player2.__name__ = "Player2";
-Player2.__super__ = Player;
-Player2.prototype = $extend(Player.prototype,{
-	increaseAngle2: null
+Player2.__super__ = flixel_FlxSprite;
+Player2.prototype = $extend(flixel_FlxSprite.prototype,{
+	playstate: null
+	,increaseAngle2: null
 	,decreaseAngle2: null
 	,increasePower2: null
 	,decreasePower2: null
 	,fire2: null
 	,angleAdjust2: null
 	,powerAdjust2: null
-	,ajustAndSend: function() {
+	,ajustAndSend2: function() {
 		var _this = flixel_FlxG.keys.pressed;
 		this.increaseAngle2 = _this.keyManager.checkStatusUnsafe(37,_this.status);
 		var _this = flixel_FlxG.keys.pressed;
@@ -8507,21 +8527,27 @@ Player2.prototype = $extend(Player.prototype,{
 		this.decreasePower2 = _this.keyManager.checkStatusUnsafe(40,_this.status);
 		var _this = flixel_FlxG.keys.pressed;
 		this.fire2 = _this.keyManager.checkStatusUnsafe(32,_this.status);
-		if(this.increaseAngle2 && (0 <= this.angleAdjust2 && this.angleAdjust2 <= 180)) {
-			this.angleAdjust2++;
+		if(this.playstate.turn == "P2") {
+			if(this.increaseAngle2 && (0 <= this.angleAdjust2 && this.angleAdjust2 <= 180)) {
+				this.angleAdjust2++;
+			}
+			if(this.increasePower2 && (0 <= this.powerAdjust2 && this.powerAdjust2 <= 2000)) {
+				this.powerAdjust2 += 15;
+			}
+			if(this.decreaseAngle2 && (0 <= this.angleAdjust2 && this.angleAdjust2 <= 180)) {
+				this.angleAdjust2--;
+			}
+			if(this.decreasePower2 && (0 <= this.powerAdjust2 && this.powerAdjust2 <= 2000)) {
+				this.powerAdjust2 -= 15;
+			}
+			if(this.fire2) {
+				(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).triggerLaunch(this.powerAdjust2,this.angleAdjust2);
+			}
 		}
-		if(this.increasePower2 && (0 <= this.powerAdjust2 && this.powerAdjust2 <= 2000)) {
-			this.powerAdjust2 += 15;
-		}
-		if(this.decreaseAngle2 && (0 <= this.angleAdjust2 && this.angleAdjust2 <= 180)) {
-			this.angleAdjust2--;
-		}
-		if(this.decreasePower2 && (0 <= this.powerAdjust2 && this.powerAdjust2 <= 2000)) {
-			this.powerAdjust2 -= 15;
-		}
-		if(this.fire2) {
-			(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).triggerLaunch(this.powerAdjust2,this.angleAdjust2);
-		}
+	}
+	,update: function(elapsed) {
+		flixel_FlxSprite.prototype.update.call(this,elapsed);
+		this.ajustAndSend2();
 	}
 	,__class__: Player2
 });
@@ -76022,7 +76048,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 694470;
+	this.version = 924079;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
