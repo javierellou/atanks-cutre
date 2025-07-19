@@ -10,13 +10,14 @@ import haxe.Timer;
 // TODO: Add Sprites and all that stuff
 class PlayState extends FlxState
 {
-	// TODO: Make the turn system work
 	public var turn:String = "P1"; 
 	/* 	"P1": Player one's turn
 	 	"P2": Player two's turn
 		"i1": Intermission and P1 next
 		"i2": Intermission and P2 next
     */
+
+	var wind:Float = 0;
 
 	var player:Player;
 	var player2:Player2;
@@ -36,13 +37,14 @@ class PlayState extends FlxState
 
 	var textPower:FlxText;
 	var textAngle:FlxText;
+	var textWind:FlxText;
 
 	override public function create()
 	{
 		super.create();
 
 		player = new Player(50, 252);
-		player2 = new Player2(600, 250);
+		player2 = new Player2(530, 250);
 
 		ground = new Ground(0, 270);
 		misile = new Misile();
@@ -52,7 +54,10 @@ class PlayState extends FlxState
 
 		textPower = new FlxText(10, 10, 300, "Power: 0");
 		textAngle = new FlxText(10, 30, 300, "Angle: 0");
-		textPower.color = textAngle.color = FlxColor.WHITE;
+		textWind = new FlxText(550, 10, 300, "Wind: 0");
+		textPower.color = textAngle.color = textWind.color = FlxColor.WHITE;
+
+		randomWind();
 
 		indicator = new FlxSprite(player.x + player.width/2, player.y - 20);
 		indicator.makeGraphic(8, 40, FlxColor.GREEN);
@@ -78,18 +83,19 @@ class PlayState extends FlxState
 		add(rightWall);
 		add(leftWall);
 
+		add(textWind);
 		add(textAngle);
 		add(textPower);
 	}
 
-	public function triggerLaunch(_power:Int, _angle:Int) {
+	public function triggerLaunch(_power:Int, _angle:Int):Void {
 		var xpos:Float = (turn == "P1") ? player.x + player.width/2: player2.x + player.width/2;
 		var ypos:Float = (turn == "P1") ? player.y : player2.y;
 		misile.launch(_power, _angle, 10, xpos, ypos);
 		turn = (turn == "P2") ? "i1" : "i2";
 	}
 
-	function updateText() {
+	function updateText():Void {
 		if (turn == "P1") {
 			textPower.text = "Power: " + Std.string(player.powerAdjust);
 			textAngle.text = "Angle: " + Std.string(player.angleAdjust);
@@ -99,7 +105,7 @@ class PlayState extends FlxState
 		}
 	}
 
-	public function explode(radius:Int) {
+	public function explode(radius:Int):Void {
         misile.velocity.x = misile.velocity.y = 0;
         var diameter = radius*2;
 
@@ -111,13 +117,22 @@ class PlayState extends FlxState
             explosionSprite.visible = false;
             misile.visible = false;
 			turn = (turn == "i1") ? "P1" : "P2";
+
+			randomWind();
         }, 2000);
     }
 
 	// Update the angle of the indicator
-	function updateIndicator() {
+	function updateIndicator():Void {
 		indicator.angle = player.angleAdjust * -1 + 90;
 		indicator2.angle = player2.angleAdjust2 * -1 + 90;
+	}
+
+	function randomWind():Void {
+		wind = Std.random(200) - 100;
+		textWind.text = "Wind: " + wind;
+
+		misile.acceleration.x = wind;
 	}
 
 	override public function update(elapsed:Float)
@@ -125,5 +140,6 @@ class PlayState extends FlxState
 		super.update(elapsed);
 		updateText();
 		updateIndicator();
+		trace(misile.acceleration.y);
 	}
 }

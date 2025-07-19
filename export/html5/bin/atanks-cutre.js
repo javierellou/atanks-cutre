@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "3";
+	app.meta.h["build"] = "4";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -8341,6 +8341,7 @@ flixel_FlxState.prototype = $extend(flixel_group_FlxTypedContainer.prototype,{
 	,__properties__: $extend(flixel_group_FlxTypedContainer.prototype.__properties__,{get_subStateClosed:"get_subStateClosed",get_subStateOpened:"get_subStateOpened",set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
 });
 var PlayState = function() {
+	this.wind = 0;
 	this.turn = "P1";
 	flixel_FlxState.call(this);
 };
@@ -8349,6 +8350,7 @@ PlayState.__name__ = "PlayState";
 PlayState.__super__ = flixel_FlxState;
 PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	turn: null
+	,wind: null
 	,player: null
 	,player2: null
 	,ground: null
@@ -8360,10 +8362,11 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,leftWall: null
 	,textPower: null
 	,textAngle: null
+	,textWind: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
 		this.player = new Player(50,252);
-		this.player2 = new Player2(600,250);
+		this.player2 = new Player2(530,250);
 		this.ground = new Ground(0,270);
 		this.misile = new Misile();
 		this.explosionSprite = new flixel_FlxSprite(this.player.x,this.player.y);
@@ -8371,7 +8374,9 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.explosionSprite.makeGraphic(10,10,-23296);
 		this.textPower = new flixel_text_FlxText(10,10,300,"Power: 0");
 		this.textAngle = new flixel_text_FlxText(10,30,300,"Angle: 0");
-		this.textPower.set_color(this.textAngle.set_color(-1));
+		this.textWind = new flixel_text_FlxText(550,10,300,"Wind: 0");
+		this.textPower.set_color(this.textAngle.set_color(this.textWind.set_color(-1)));
+		this.randomWind();
 		this.indicator = new flixel_FlxSprite(this.player.x + this.player.get_width() / 2,this.player.y - 20);
 		this.indicator.makeGraphic(8,40,-16744448);
 		this.indicator2 = new flixel_FlxSprite(this.player2.x + this.player2.get_width() / 2,this.player2.y - 20);
@@ -8389,6 +8394,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.indicator2);
 		this.add(this.rightWall);
 		this.add(this.leftWall);
+		this.add(this.textWind);
 		this.add(this.textAngle);
 		this.add(this.textPower);
 	}
@@ -8419,16 +8425,23 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			_gthis.explosionSprite.set_visible(false);
 			_gthis.misile.set_visible(false);
 			_gthis.turn = _gthis.turn == "i1" ? "P1" : "P2";
+			_gthis.randomWind();
 		},2000);
 	}
 	,updateIndicator: function() {
 		this.indicator.set_angle(this.player.angleAdjust * -1 + 90);
 		this.indicator2.set_angle(this.player2.angleAdjust2 * -1 + 90);
 	}
+	,randomWind: function() {
+		this.wind = Std.random(200) - 100;
+		this.textWind.set_text("Wind: " + this.wind);
+		this.misile.acceleration.set_x(this.wind);
+	}
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
 		this.updateText();
 		this.updateIndicator();
+		haxe_Log.trace(this.misile.acceleration.y,{ fileName : "source/PlayState.hx", lineNumber : 143, className : "PlayState", methodName : "update"});
 	}
 	,__class__: PlayState
 });
@@ -8673,6 +8686,13 @@ Std.parseInt = function(x) {
 		return null;
 	}
 	return v;
+};
+Std.random = function(x) {
+	if(x <= 0) {
+		return 0;
+	} else {
+		return Math.floor(Math.random() * x);
+	}
 };
 var _$String_String_$Impl_$ = function() { };
 $hxClasses["_String.String_Impl_"] = _$String_String_$Impl_$;
@@ -76048,7 +76068,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 924079;
+	this.version = 247201;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
