@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import flixel.FlxState;
@@ -39,6 +40,9 @@ class PlayState extends FlxState
 	var textAngle:FlxText;
 	var textWind:FlxText;
 
+	var textP1Life:FlxText;
+	var textP2Life:FlxText;
+
 	override public function create()
 	{
 		super.create();
@@ -55,30 +59,36 @@ class PlayState extends FlxState
 		textPower = new FlxText(10, 10, 300, "Power: 0");
 		textAngle = new FlxText(10, 30, 300, "Angle: 0");
 		textWind = new FlxText(550, 10, 300, "Wind: 0");
-		textPower.color = textAngle.color = textWind.color = FlxColor.WHITE;
+		textP1Life = new FlxText(player.x, player.y - 10, 300, "100");
+		textP2Life = new FlxText(player2.x, player.y - 10, 300, "100");
+
+		textPower.color = textAngle.color = textWind.color = 
+		textP1Life.color = textP2Life.color = FlxColor.WHITE;
 
 		randomWind();
 
-		indicator = new FlxSprite(player.x + player.width/2, player.y - 20);
-		indicator.makeGraphic(8, 40, FlxColor.GREEN);
+		indicator = new FlxSprite(player.x + 24, player.y - 11);
+		indicator.makeGraphic(2, 40, FlxColor.GREEN);
 
-		indicator2 = new FlxSprite(player2.x + player2.width/2, player2.y - 20);
-		indicator2.makeGraphic(8, 40, FlxColor.RED);
+		indicator2 = new FlxSprite(player2.x + 10, player2.y - 15);
+		indicator2.makeGraphic(2, 40, FlxColor.YELLOW);
 
 		rightWall = new FlxSprite(FlxG.width - 10, FlxG.height - 1000);
 		rightWall.makeGraphic(10, 1000, FlxColor.GREEN);
 		leftWall = new FlxSprite(0, FlxG.height - 1000);
 		leftWall.makeGraphic(10, 1000, FlxColor.GREEN);
 
-		add(player);
-		add(player2);
-
-		add(ground);
 		add(misile);
-		add(explosionSprite);
 
 		add(indicator);
 		add(indicator2);
+
+		add(ground);
+
+		add(player);
+		add(player2);
+
+		add(explosionSprite);
 
 		add(rightWall);
 		add(leftWall);
@@ -86,11 +96,13 @@ class PlayState extends FlxState
 		add(textWind);
 		add(textAngle);
 		add(textPower);
+		add(textP1Life);
+		add(textP2Life);
 	}
 
 	public function triggerLaunch(_power:Int, _angle:Int):Void {
-		var xpos:Float = (turn == "P1") ? player.x + player.width/2: player2.x + player.width/2;
-		var ypos:Float = (turn == "P1") ? player.y : player2.y;
+		var xpos:Float = (turn == "P1") ? player.x + 24: player2.x + 10;
+		var ypos:Float = (turn == "P1") ? player.y - 1 : player2.y - 7;
 		misile.launch(_power, _angle, 10, xpos, ypos);
 		turn = (turn == "P2") ? "i1" : "i2";
 	}
@@ -103,16 +115,33 @@ class PlayState extends FlxState
 			textPower.text = "Power: " + Std.string(player2.powerAdjust2);
 			textAngle.text = "Angle: " + Std.string(player2.angleAdjust2);
 		}
+
+		textP1Life.text = Std.string(player.life);
+		textP2Life.text = Std.string(player2.life);
 	}
 
 	public function explode(radius:Int):Void {
         misile.velocity.x = misile.velocity.y = 0;
-        var diameter = radius*2;
+    	var diameter = radius * 2;
 
-        explosionSprite.setGraphicSize(diameter, diameter);
-		explosionSprite.x = misile.x - radius / 2;
-		explosionSprite.y = misile.y - radius / 2;
-		explosionSprite.visible = true;
+    	explosionSprite.setGraphicSize(diameter, diameter);
+    	explosionSprite.updateHitbox(); // <- asegúrate de que width/height se actualicen
+
+    	explosionSprite.x = (misile.x + misile.width / 2) - radius;
+    	explosionSprite.y = misile.y;
+    	explosionSprite.visible = true;
+
+		if (FlxCollision.pixelPerfectCheck(player, explosionSprite)) {
+			player.life -= 20;
+		}
+		if (FlxCollision.pixelPerfectCheck(player2, explosionSprite)) {
+			player2.life -= 20;
+		}
+
+		if (player.life <= 0 || player2.life <= 0) {
+			die();
+		}
+
         Timer.delay(() -> {
             explosionSprite.visible = false;
             misile.visible = false;
@@ -120,6 +149,8 @@ class PlayState extends FlxState
 
 			randomWind();
         }, 2000);
+
+		
     }
 
 	// Update the angle of the indicator
@@ -135,11 +166,27 @@ class PlayState extends FlxState
 		misile.acceleration.x = wind;
 	}
 
+	function die():Void {
+		var whoDied:FlxSprite = (player.life == 0) ? player : player2;
+
+		explode(100);
+		whoDied.destroy();
+		if (whoDied == player) {
+			indicator.destroy();
+			textP1Life.destroy();
+		} else {
+			indicator2.destroy(); 
+			textP2Life.destroy();
+		}
+
+		// TODO: Go to main menu
+	}
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
 		updateText();
 		updateIndicator();
-		trace(misile.acceleration.y);
+		misile.acceleration.x = wind;
 	}
 }

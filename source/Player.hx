@@ -19,10 +19,13 @@ class Player extends FlxSprite {
     @:allow(PlayState)
     var powerAdjust:Int = 1000;
 
+    public var life = 100;
+
     public function new(x:Float, y:Float) {
         super(x, y);
 
-        makeGraphic(35, 18, FlxColor.GREEN);
+        //makeGraphic(35, 18, FlxColor.GREEN);
+        loadGraphic(AssetPaths.player1__png, false, 35, 18);
     }
 
     function ajustAndSend() {
