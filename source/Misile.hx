@@ -35,7 +35,7 @@ class Misile extends FlxSprite {
             cast(FlxG.state, PlayState).explode(_radius);
             moving = false;
             velocity.set(0, 0);
-            acceleration.y = 0;
+            acceleration.set(0, 0);
         }
         
         if (FlxCollision.pixelPerfectCheck(this, playstate.leftWall) || FlxCollision.pixelPerfectCheck(this, playstate.rightWall)) {

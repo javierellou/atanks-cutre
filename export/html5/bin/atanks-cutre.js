@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "5";
+	app.meta.h["build"] = "6";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -7173,7 +7173,7 @@ ManifestResources.init = function(config) {
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
 	var bundle;
-	var data = "{\"name\":null,\"assets\":\"aoy4:pathy36:assets%2Fmusic%2Fmusic-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y34:assets%2Fdata%2Fdata-goes-here.txtR2zR3R4R5R7R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R8R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R9R6tgoR0y29:assets%2Fimages%2Fplayer1.pngR2i214R3y5:IMAGER5R10R6tgoR0y29:assets%2Fimages%2Fplayer2.pngR2i298R3R11R5R12R6tgoR2i8220R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR14y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R13R5y28:flixel%2Fsounds%2Fflixel.mp3R15aR17y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i33629R3y5:SOUNDR5R18R15aR17R18hgoR2i6840R3R19R5R16R15aR14R16hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R20R21y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i277R3R11R5R26R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i505R3R11R5R27R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	var data = "{\"name\":null,\"assets\":\"aoy4:pathy36:assets%2Fmusic%2Fmusic-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y34:assets%2Fdata%2Fdata-goes-here.txtR2zR3R4R5R7R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R8R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R9R6tgoR0y31:assets%2Fimages%2Fexplosion.pngR2i327R3y5:IMAGER5R10R6tgoR0y29:assets%2Fimages%2Fplayer1.pngR2i214R3R11R5R12R6tgoR0y31:assets%2Fimages%2FIndicator.pngR2i144R3R11R5R13R6tgoR0y29:assets%2Fimages%2Fplayer2.pngR2i298R3R11R5R14R6tgoR2i8220R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR16y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R15R5y28:flixel%2Fsounds%2Fflixel.mp3R17aR19y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i33629R3y5:SOUNDR5R20R17aR19R20hgoR2i6840R3R21R5R18R17aR16R18hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R22R23y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i277R3R11R5R28R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i505R3R11R5R29R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
 	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
 	var library = lime_utils_AssetLibrary.fromManifest(manifest);
 	lime_utils_Assets.registerLibrary("default",library);
@@ -7581,7 +7581,17 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 			}
 			this1.set_x(x);
 			this1.set_y(y);
-			this.acceleration.set_y(0);
+			var this1 = this.acceleration;
+			var x = 0;
+			var y = 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
 		}
 		if(flixel_util_FlxCollision.pixelPerfectCheck(this,this.playstate.leftWall) || flixel_util_FlxCollision.pixelPerfectCheck(this,this.playstate.rightWall)) {
 			this.velocity.set_x(this.velocity.x * -1);
@@ -8361,6 +8371,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,explosionSprite: null
 	,indicator: null
 	,indicator2: null
+	,misileIndicator: null
 	,rightWall: null
 	,leftWall: null
 	,textPower: null
@@ -8376,7 +8387,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.misile = new Misile();
 		this.explosionSprite = new flixel_FlxSprite(this.player.x,this.player.y);
 		this.explosionSprite.set_visible(false);
-		this.explosionSprite.makeGraphic(10,10,-23296);
+		this.explosionSprite.loadGraphic("assets/images/explosion.png",false,32,32);
 		this.textPower = new flixel_text_FlxText(10,10,300,"Power: 0");
 		this.textAngle = new flixel_text_FlxText(10,30,300,"Angle: 0");
 		this.textWind = new flixel_text_FlxText(550,10,300,"Wind: 0");
@@ -8385,9 +8396,11 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.textPower.set_color(this.textAngle.set_color(this.textWind.set_color(this.textP1Life.set_color(this.textP2Life.set_color(-1)))));
 		this.randomWind();
 		this.indicator = new flixel_FlxSprite(this.player.x + 24,this.player.y - 11);
-		this.indicator.makeGraphic(2,40,-16744448);
+		this.indicator.loadGraphic("assets/images/Indicator.png",false,5,40);
 		this.indicator2 = new flixel_FlxSprite(this.player2.x + 10,this.player2.y - 15);
-		this.indicator2.makeGraphic(2,40,-256);
+		this.indicator2.loadGraphic("assets/images/Indicator.png",false,5,40);
+		this.misileIndicator = new flixel_FlxSprite(0,20);
+		this.misileIndicator.makeGraphic(18,18,-1);
 		this.rightWall = new flixel_FlxSprite(flixel_FlxG.width - 10,flixel_FlxG.height - 1000);
 		this.rightWall.makeGraphic(10,1000,-16744448);
 		this.leftWall = new flixel_FlxSprite(0,flixel_FlxG.height - 1000);
@@ -8395,6 +8408,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.misile);
 		this.add(this.indicator);
 		this.add(this.indicator2);
+		this.add(this.misileIndicator);
 		this.add(this.ground);
 		this.add(this.player);
 		this.add(this.player2);
@@ -8410,7 +8424,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,triggerLaunch: function(_power,_angle) {
 		var xpos = this.turn == "P1" ? this.player.x + 24 : this.player2.x + 10;
 		var ypos = this.turn == "P1" ? this.player.y - 1 : this.player2.y - 7;
-		this.misile.launch(_power,_angle,10,xpos,ypos);
+		this.misile.launch(_power,_angle,16,xpos,ypos);
 		this.turn = this.turn == "P2" ? "i1" : "i2";
 	}
 	,updateText: function() {
@@ -8433,6 +8447,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.explosionSprite.set_x(this.misile.x + this.misile.get_width() / 2 - radius);
 		this.explosionSprite.set_y(this.misile.y);
 		this.explosionSprite.set_visible(true);
+		this.misile.set_visible(false);
 		if(flixel_util_FlxCollision.pixelPerfectCheck(this.player,this.explosionSprite)) {
 			this.player.life -= 20;
 		}
@@ -8444,7 +8459,6 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		}
 		haxe_Timer.delay(function() {
 			_gthis.explosionSprite.set_visible(false);
-			_gthis.misile.set_visible(false);
 			_gthis.turn = _gthis.turn == "i1" ? "P1" : "P2";
 			_gthis.randomWind();
 		},2000);
@@ -8452,9 +8466,15 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,updateIndicator: function() {
 		this.indicator.set_angle(this.player.angleAdjust * -1 + 90);
 		this.indicator2.set_angle(this.player2.angleAdjust2 * -1 + 90);
+		if(this.misile.y < 0) {
+			this.misileIndicator.set_visible(true);
+			this.misileIndicator.set_x(this.misile.x);
+		} else {
+			this.misileIndicator.set_visible(false);
+		}
 	}
 	,randomWind: function() {
-		this.wind = Std.random(2000) - 1000;
+		this.wind = Std.random(200) - 100;
 		this.textWind.set_text("Wind: " + this.wind);
 		this.misile.acceleration.set_x(this.wind);
 	}
@@ -76105,7 +76125,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 29102;
+	this.version = 155063;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -124922,9 +124942,11 @@ AssetPaths.music_goes_here__txt = "assets/music/music-goes-here.txt";
 AssetPaths.data_goes_here__txt = "assets/data/data-goes-here.txt";
 AssetPaths.sounds_go_here__txt = "assets/sounds/sounds-go-here.txt";
 AssetPaths.images_go_here__txt = "assets/images/images-go-here.txt";
+AssetPaths.explosion__png = "assets/images/explosion.png";
 AssetPaths.player1__png = "assets/images/player1.png";
+AssetPaths.Indicator__png = "assets/images/Indicator.png";
 AssetPaths.player2__png = "assets/images/player2.png";
-AssetPaths.allFiles = ["assets/music/music-goes-here.txt","assets/data/data-goes-here.txt","assets/sounds/sounds-go-here.txt","assets/images/images-go-here.txt","assets/images/player1.png","assets/images/player2.png"];
+AssetPaths.allFiles = ["assets/music/music-goes-here.txt","assets/data/data-goes-here.txt","assets/sounds/sounds-go-here.txt","assets/images/images-go-here.txt","assets/images/explosion.png","assets/images/player1.png","assets/images/Indicator.png","assets/images/player2.png"];
 flixel_FlxBasic.idEnumerator = 0;
 flixel_math_FlxRect._pool = (function($this) {
 	var $r;

@@ -30,6 +30,7 @@ class PlayState extends FlxState
 
 	var indicator:FlxSprite;
 	var indicator2:FlxSprite;
+	var misileIndicator:FlxSprite; // It indicates where the misile is when it's out of the screen
 
 	@:allow(Misile)
 	var rightWall:FlxSprite;
@@ -54,7 +55,7 @@ class PlayState extends FlxState
 		misile = new Misile();
 		explosionSprite = new FlxSprite(player.x, player.y);
 		explosionSprite.visible = false;
-		explosionSprite.makeGraphic(10, 10, FlxColor.ORANGE);
+		explosionSprite.loadGraphic(AssetPaths.explosion__png, false, 32, 32);
 
 		textPower = new FlxText(10, 10, 300, "Power: 0");
 		textAngle = new FlxText(10, 30, 300, "Angle: 0");
@@ -68,10 +69,13 @@ class PlayState extends FlxState
 		randomWind();
 
 		indicator = new FlxSprite(player.x + 24, player.y - 11);
-		indicator.makeGraphic(2, 40, FlxColor.GREEN);
+		indicator.loadGraphic(AssetPaths.Indicator__png, false, 5, 40);
 
 		indicator2 = new FlxSprite(player2.x + 10, player2.y - 15);
-		indicator2.makeGraphic(2, 40, FlxColor.YELLOW);
+		indicator2.loadGraphic(AssetPaths.Indicator__png, false, 5, 40);
+
+		misileIndicator = new FlxSprite(0, 20);
+		misileIndicator.makeGraphic(18, 18, FlxColor.WHITE);
 
 		rightWall = new FlxSprite(FlxG.width - 10, FlxG.height - 1000);
 		rightWall.makeGraphic(10, 1000, FlxColor.GREEN);
@@ -82,6 +86,7 @@ class PlayState extends FlxState
 
 		add(indicator);
 		add(indicator2);
+		add(misileIndicator);
 
 		add(ground);
 
@@ -103,7 +108,7 @@ class PlayState extends FlxState
 	public function triggerLaunch(_power:Int, _angle:Int):Void {
 		var xpos:Float = (turn == "P1") ? player.x + 24: player2.x + 10;
 		var ypos:Float = (turn == "P1") ? player.y - 1 : player2.y - 7;
-		misile.launch(_power, _angle, 10, xpos, ypos);
+		misile.launch(_power, _angle, 16, xpos, ypos);
 		turn = (turn == "P2") ? "i1" : "i2";
 	}
 
@@ -130,6 +135,7 @@ class PlayState extends FlxState
     	explosionSprite.x = (misile.x + misile.width / 2) - radius;
     	explosionSprite.y = misile.y;
     	explosionSprite.visible = true;
+		misile.visible = false;
 
 		if (FlxCollision.pixelPerfectCheck(player, explosionSprite)) {
 			player.life -= 20;
@@ -144,7 +150,6 @@ class PlayState extends FlxState
 
         Timer.delay(() -> {
             explosionSprite.visible = false;
-            misile.visible = false;
 			turn = (turn == "i1") ? "P1" : "P2";
 
 			randomWind();
@@ -157,6 +162,12 @@ class PlayState extends FlxState
 	function updateIndicator():Void {
 		indicator.angle = player.angleAdjust * -1 + 90;
 		indicator2.angle = player2.angleAdjust2 * -1 + 90;
+		if (misile.y < 0) {
+			misileIndicator.visible = true;
+			misileIndicator.x = misile.x;
+		} else {
+			misileIndicator.visible = false;
+		}
 	}
 
 	function randomWind():Void {
