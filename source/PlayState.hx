@@ -125,15 +125,19 @@ class PlayState extends FlxState
 		textP2Life.text = Std.string(player2.life);
 	}
 
-	public function explode(radius:Int):Void {
+	public function explode(radius:Int, isPlayerExplosion:Bool = false):Void {
         misile.velocity.x = misile.velocity.y = 0;
     	var diameter = radius * 2;
 
     	explosionSprite.setGraphicSize(diameter, diameter);
-    	explosionSprite.updateHitbox(); // <- asegúrate de que width/height se actualicen
+    	explosionSprite.updateHitbox();
 
     	explosionSprite.x = (misile.x + misile.width / 2) - radius;
-    	explosionSprite.y = misile.y;
+		if (isPlayerExplosion) {
+			explosionSprite.y = misile.y - 50;
+		} else {
+    		explosionSprite.y = misile.y - 10; // So it doesn't go underground
+		} 
     	explosionSprite.visible = true;
 		misile.visible = false;
 
@@ -144,8 +148,9 @@ class PlayState extends FlxState
 			player2.life -= 20;
 		}
 
-		if (player.life <= 0 || player2.life <= 0) {
+		if ((player.life <= 0 || player2.life <= 0) && !isPlayerExplosion) {
 			die();
+			return;
 		}
 
         Timer.delay(() -> {
@@ -180,12 +185,13 @@ class PlayState extends FlxState
 	function die():Void {
 		var whoDied:FlxSprite = (player.life == 0) ? player : player2;
 
-		explode(100);
-		whoDied.destroy();
+		explode(100, true);
 		if (whoDied == player) {
+			player.destroy();
 			indicator.destroy();
 			textP1Life.destroy();
 		} else {
+			player2.destroy();
 			indicator2.destroy(); 
 			textP2Life.destroy();
 		}

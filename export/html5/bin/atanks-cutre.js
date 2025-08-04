@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "6";
+	app.meta.h["build"] = "7";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -8438,14 +8438,21 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.textP1Life.set_text(Std.string(this.player.life));
 		this.textP2Life.set_text(Std.string(this.player2.life));
 	}
-	,explode: function(radius) {
+	,explode: function(radius,isPlayerExplosion) {
+		if(isPlayerExplosion == null) {
+			isPlayerExplosion = false;
+		}
 		var _gthis = this;
 		this.misile.velocity.set_x(this.misile.velocity.set_y(0));
 		var diameter = radius * 2;
 		this.explosionSprite.setGraphicSize(diameter,diameter);
 		this.explosionSprite.updateHitbox();
 		this.explosionSprite.set_x(this.misile.x + this.misile.get_width() / 2 - radius);
-		this.explosionSprite.set_y(this.misile.y);
+		if(isPlayerExplosion) {
+			this.explosionSprite.set_y(this.misile.y - 50);
+		} else {
+			this.explosionSprite.set_y(this.misile.y - 10);
+		}
 		this.explosionSprite.set_visible(true);
 		this.misile.set_visible(false);
 		if(flixel_util_FlxCollision.pixelPerfectCheck(this.player,this.explosionSprite)) {
@@ -8454,8 +8461,9 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		if(flixel_util_FlxCollision.pixelPerfectCheck(this.player2,this.explosionSprite)) {
 			this.player2.life -= 20;
 		}
-		if(this.player.life <= 0 || this.player2.life <= 0) {
+		if((this.player.life <= 0 || this.player2.life <= 0) && !isPlayerExplosion) {
 			this.die();
+			return;
 		}
 		haxe_Timer.delay(function() {
 			_gthis.explosionSprite.set_visible(false);
@@ -8480,12 +8488,13 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,die: function() {
 		var whoDied = this.player.life == 0 ? this.player : this.player2;
-		this.explode(100);
-		whoDied.destroy();
+		this.explode(100,true);
 		if(whoDied == this.player) {
+			this.player.destroy();
 			this.indicator.destroy();
 			this.textP1Life.destroy();
 		} else {
+			this.player.destroy();
 			this.indicator2.destroy();
 			this.textP2Life.destroy();
 		}
@@ -76125,7 +76134,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 155063;
+	this.version = 578156;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
