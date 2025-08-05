@@ -44,14 +44,19 @@ class PlayState extends FlxState
 	var textP1Life:FlxText;
 	var textP2Life:FlxText;
 
+	var sky:FlxSprite;
+
 	override public function create()
 	{
 		super.create();
 
+		sky = new FlxSprite(0, 0);
+		sky.loadGraphic("assets/images/sky.jpg", false, FlxG.width, FlxG.height);
+
 		player = new Player(50, 252);
 		player2 = new Player2(530, 250);
 
-		ground = new Ground(0, 270);
+		ground = new Ground(0, 0);
 		misile = new Misile();
 		explosionSprite = new FlxSprite(player.x, player.y);
 		explosionSprite.visible = false;
@@ -64,7 +69,7 @@ class PlayState extends FlxState
 		textP2Life = new FlxText(player2.x, player.y - 10, 300, "100");
 
 		textPower.color = textAngle.color = textWind.color = 
-		textP1Life.color = textP2Life.color = FlxColor.WHITE;
+		textP1Life.color = textP2Life.color = FlxColor.BLACK;
 
 		randomWind();
 
@@ -81,6 +86,8 @@ class PlayState extends FlxState
 		rightWall.makeGraphic(10, 1000, FlxColor.GREEN);
 		leftWall = new FlxSprite(0, FlxG.height - 1000);
 		leftWall.makeGraphic(10, 1000, FlxColor.GREEN);
+
+		add(sky);
 
 		add(misile);
 
@@ -134,10 +141,10 @@ class PlayState extends FlxState
 
     	explosionSprite.x = (misile.x + misile.width / 2) - radius;
 		if (isPlayerExplosion) {
-			explosionSprite.y = misile.y - 50;
+			explosionSprite.y = misile.y - 80;
 		} else {
     		explosionSprite.y = misile.y - 10; // So it doesn't go underground
-		} 
+		}
     	explosionSprite.visible = true;
 		misile.visible = false;
 
@@ -147,6 +154,8 @@ class PlayState extends FlxState
 		if (FlxCollision.pixelPerfectCheck(player2, explosionSprite)) {
 			player2.life -= 20;
 		}
+
+		ground.destroyTerrain(explosionSprite.x, explosionSprite.y, radius);
 
 		if ((player.life <= 0 || player2.life <= 0) && !isPlayerExplosion) {
 			die();
@@ -204,6 +213,8 @@ class PlayState extends FlxState
 		super.update(elapsed);
 		updateText();
 		updateIndicator();
+
 		misile.acceleration.x = wind;
+		misile.angle = Math.atan2(misile.velocity.y, misile.velocity.x) * 180 / Math.PI + 90;
 	}
 }

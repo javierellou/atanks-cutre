@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "7";
+	app.meta.h["build"] = "8";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -7058,14 +7058,24 @@ flixel_FlxSprite.prototype = $extend(flixel_FlxObject.prototype,{
 	,__properties__: $extend(flixel_FlxObject.prototype.__properties__,{set_clipRect:"set_clipRect",set_color:"set_color",set_blend:"set_blend",set_flipY:"set_flipY",set_flipX:"set_flipX",set_facing:"set_facing",set_alpha:"set_alpha",set_graphic:"set_graphic",set_frames:"set_frames",get_numFrames:"get_numFrames",set_frame:"set_frame",set_pixels:"set_pixels",get_pixels:"get_pixels",set_antialiasing:"set_antialiasing",set_useFramePixels:"set_useFramePixels"})
 });
 var Ground = function(x,y) {
+	this.map = Std.random(2);
 	flixel_FlxSprite.call(this,x,y);
-	this.makeGraphic(640,300,-8388480);
+	if(this.map == 0) {
+		this.loadGraphic("assets/images/Terrain1.png");
+	} else {
+		this.loadGraphic("assets/images/Terrain2.png");
+	}
 };
 $hxClasses["Ground"] = Ground;
 Ground.__name__ = "Ground";
 Ground.__super__ = flixel_FlxSprite;
 Ground.prototype = $extend(flixel_FlxSprite.prototype,{
-	__class__: Ground
+	map: null
+	,destroyTerrain: function(x,y,radius) {
+		flixel_util_FlxSpriteUtil.drawCircle(this,x,y,radius,0);
+		this.dirty = true;
+	}
+	,__class__: Ground
 });
 var HxOverrides = function() { };
 $hxClasses["HxOverrides"] = HxOverrides;
@@ -7173,7 +7183,7 @@ ManifestResources.init = function(config) {
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
 	var bundle;
-	var data = "{\"name\":null,\"assets\":\"aoy4:pathy36:assets%2Fmusic%2Fmusic-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y34:assets%2Fdata%2Fdata-goes-here.txtR2zR3R4R5R7R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R8R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R9R6tgoR0y31:assets%2Fimages%2Fexplosion.pngR2i327R3y5:IMAGER5R10R6tgoR0y29:assets%2Fimages%2Fplayer1.pngR2i214R3R11R5R12R6tgoR0y31:assets%2Fimages%2FIndicator.pngR2i144R3R11R5R13R6tgoR0y29:assets%2Fimages%2Fplayer2.pngR2i298R3R11R5R14R6tgoR2i8220R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR16y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R15R5y28:flixel%2Fsounds%2Fflixel.mp3R17aR19y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i33629R3y5:SOUNDR5R20R17aR19R20hgoR2i6840R3R21R5R18R17aR16R18hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R22R23y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i277R3R11R5R28R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i505R3R11R5R29R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	var data = "{\"name\":null,\"assets\":\"aoy4:pathy36:assets%2Fmusic%2Fmusic-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y34:assets%2Fdata%2Fdata-goes-here.txtR2zR3R4R5R7R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R8R6tgoR0y25:assets%2Fimages%2Fsky.jpgR2i29367R3y5:IMAGER5R9R6tgoR0y30:assets%2Fimages%2FTerrain2.pngR2i23789R3R10R5R11R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R12R6tgoR0y31:assets%2Fimages%2Fexplosion.pngR2i327R3R10R5R13R6tgoR0y30:assets%2Fimages%2FTerrain1.pngR2i5916R3R10R5R14R6tgoR0y29:assets%2Fimages%2Fplayer1.pngR2i214R3R10R5R15R6tgoR0y31:assets%2Fimages%2FIndicator.pngR2i160R3R10R5R16R6tgoR0y28:assets%2Fimages%2Fmisile.pngR2i264R3R10R5R17R6tgoR0y29:assets%2Fimages%2Fplayer2.pngR2i298R3R10R5R18R6tgoR2i8220R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR20y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R19R5y28:flixel%2Fsounds%2Fflixel.mp3R21aR23y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i33629R3y5:SOUNDR5R24R21aR23R24hgoR2i6840R3R25R5R22R21aR20R22hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R26R27y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i277R3R10R5R32R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i505R3R10R5R33R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
 	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
 	var library = lime_utils_AssetLibrary.fromManifest(manifest);
 	lime_utils_Assets.registerLibrary("default",library);
@@ -7526,7 +7536,7 @@ var Misile = function(x,y) {
 	this.moving = false;
 	this.playstate = flixel_FlxG.game._state;
 	flixel_FlxSprite.call(this,x,y);
-	this.makeGraphic(10,10,-256);
+	this.loadGraphic("assets/images/misile.png",false,10,20);
 	this.drag.set_x(this.drag.set_y(400));
 };
 $hxClasses["Misile"] = Misile;
@@ -7536,15 +7546,15 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 	playstate: null
 	,moving: null
 	,_radius: null
-	,launch: function(power,angle,radiusExplosion,_x,_y) {
+	,launch: function(power,angleLaunch,radiusExplosion,_x,_y) {
 		this.set_x(_x);
 		this.set_y(_y);
 		this.set_visible(true);
 		this._radius = radiusExplosion;
 		var SPEED = power;
 		var this1 = this.velocity;
-		var x = Math.cos(angle * Math.PI / 180) * SPEED;
-		var y = Math.sin(angle * Math.PI / 180) * -1 * SPEED;
+		var x = Math.cos(angleLaunch * Math.PI / 180) * SPEED;
+		var y = Math.sin(angleLaunch * Math.PI / 180) * -1 * SPEED;
 		if(y == null) {
 			y = 0;
 		}
@@ -7564,6 +7574,7 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 		}
 		this1.set_x(x);
 		this1.set_y(y);
+		this.set_angle(angleLaunch);
 		this.moving = true;
 	}
 	,parable: function() {
@@ -8379,11 +8390,14 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,textWind: null
 	,textP1Life: null
 	,textP2Life: null
+	,sky: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
+		this.sky = new flixel_FlxSprite(0,0);
+		this.sky.loadGraphic("assets/images/sky.jpg",false,flixel_FlxG.width,flixel_FlxG.height);
 		this.player = new Player(50,252);
 		this.player2 = new Player2(530,250);
-		this.ground = new Ground(0,270);
+		this.ground = new Ground(0,0);
 		this.misile = new Misile();
 		this.explosionSprite = new flixel_FlxSprite(this.player.x,this.player.y);
 		this.explosionSprite.set_visible(false);
@@ -8393,7 +8407,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.textWind = new flixel_text_FlxText(550,10,300,"Wind: 0");
 		this.textP1Life = new flixel_text_FlxText(this.player.x,this.player.y - 10,300,"100");
 		this.textP2Life = new flixel_text_FlxText(this.player2.x,this.player.y - 10,300,"100");
-		this.textPower.set_color(this.textAngle.set_color(this.textWind.set_color(this.textP1Life.set_color(this.textP2Life.set_color(-1)))));
+		this.textPower.set_color(this.textAngle.set_color(this.textWind.set_color(this.textP1Life.set_color(this.textP2Life.set_color(-16777216)))));
 		this.randomWind();
 		this.indicator = new flixel_FlxSprite(this.player.x + 24,this.player.y - 11);
 		this.indicator.loadGraphic("assets/images/Indicator.png",false,5,40);
@@ -8405,6 +8419,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.rightWall.makeGraphic(10,1000,-16744448);
 		this.leftWall = new flixel_FlxSprite(0,flixel_FlxG.height - 1000);
 		this.leftWall.makeGraphic(10,1000,-16744448);
+		this.add(this.sky);
 		this.add(this.misile);
 		this.add(this.indicator);
 		this.add(this.indicator2);
@@ -8449,7 +8464,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.explosionSprite.updateHitbox();
 		this.explosionSprite.set_x(this.misile.x + this.misile.get_width() / 2 - radius);
 		if(isPlayerExplosion) {
-			this.explosionSprite.set_y(this.misile.y - 50);
+			this.explosionSprite.set_y(this.misile.y - 80);
 		} else {
 			this.explosionSprite.set_y(this.misile.y - 10);
 		}
@@ -8461,6 +8476,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		if(flixel_util_FlxCollision.pixelPerfectCheck(this.player2,this.explosionSprite)) {
 			this.player2.life -= 20;
 		}
+		this.ground.destroyTerrain(this.explosionSprite.x,this.explosionSprite.y,radius);
 		if((this.player.life <= 0 || this.player2.life <= 0) && !isPlayerExplosion) {
 			this.die();
 			return;
@@ -8494,7 +8510,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			this.indicator.destroy();
 			this.textP1Life.destroy();
 		} else {
-			this.player.destroy();
+			this.player2.destroy();
 			this.indicator2.destroy();
 			this.textP2Life.destroy();
 		}
@@ -8504,6 +8520,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.updateText();
 		this.updateIndicator();
 		this.misile.acceleration.set_x(this.wind);
+		this.misile.set_angle(Math.atan2(this.misile.velocity.y,this.misile.velocity.x) * 180 / Math.PI + 90);
 	}
 	,__class__: PlayState
 });
@@ -76134,7 +76151,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 578156;
+	this.version = 955841;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -124950,12 +124967,16 @@ openfl_display_DisplayObject.__tempStack = new lime_utils_ObjectPool(function() 
 AssetPaths.music_goes_here__txt = "assets/music/music-goes-here.txt";
 AssetPaths.data_goes_here__txt = "assets/data/data-goes-here.txt";
 AssetPaths.sounds_go_here__txt = "assets/sounds/sounds-go-here.txt";
+AssetPaths.sky__jpg = "assets/images/sky.jpg";
+AssetPaths.Terrain2__png = "assets/images/Terrain2.png";
 AssetPaths.images_go_here__txt = "assets/images/images-go-here.txt";
 AssetPaths.explosion__png = "assets/images/explosion.png";
+AssetPaths.Terrain1__png = "assets/images/Terrain1.png";
 AssetPaths.player1__png = "assets/images/player1.png";
 AssetPaths.Indicator__png = "assets/images/Indicator.png";
+AssetPaths.misile__png = "assets/images/misile.png";
 AssetPaths.player2__png = "assets/images/player2.png";
-AssetPaths.allFiles = ["assets/music/music-goes-here.txt","assets/data/data-goes-here.txt","assets/sounds/sounds-go-here.txt","assets/images/images-go-here.txt","assets/images/explosion.png","assets/images/player1.png","assets/images/Indicator.png","assets/images/player2.png"];
+AssetPaths.allFiles = ["assets/music/music-goes-here.txt","assets/data/data-goes-here.txt","assets/sounds/sounds-go-here.txt","assets/images/sky.jpg","assets/images/Terrain2.png","assets/images/images-go-here.txt","assets/images/explosion.png","assets/images/Terrain1.png","assets/images/player1.png","assets/images/Indicator.png","assets/images/misile.png","assets/images/player2.png"];
 flixel_FlxBasic.idEnumerator = 0;
 flixel_math_FlxRect._pool = (function($this) {
 	var $r;

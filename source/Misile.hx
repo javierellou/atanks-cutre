@@ -1,10 +1,9 @@
 package;
 
 import flixel.FlxG;
-import flixel.util.FlxColor;
 import flixel.util.FlxCollision;
 import flixel.FlxSprite;
-
+// TODO: make the rotation
 class Misile extends FlxSprite {
     var playstate:PlayState = cast flixel.FlxG.state;
     var moving:Bool = false;
@@ -13,11 +12,11 @@ class Misile extends FlxSprite {
     public function new(x:Float = -50, y:Float = -50) {
         super(x, y);
 
-        makeGraphic(10, 10, FlxColor.YELLOW);
+        loadGraphic(AssetPaths.misile__png, false, 10, 20);
         drag.x = drag.y = 400;
     }
 
-    public function launch(power:Int, angle:Int, radiusExplosion:Int, _x:Float, _y:Float) {
+    public function launch(power:Int, angleLaunch:Int, radiusExplosion:Int, _x:Float, _y:Float) {
         x = _x;
         y = _y;
         visible = true;
@@ -25,8 +24,9 @@ class Misile extends FlxSprite {
         _radius = radiusExplosion;
         
         var SPEED = power;
-        velocity.set(Math.cos(angle * Math.PI / 180) * SPEED, Math.sin(angle * Math.PI / 180) * -1 * SPEED);
+        velocity.set(Math.cos(angleLaunch * Math.PI / 180) * SPEED, Math.sin(angleLaunch * Math.PI / 180) * -1 * SPEED);
         acceleration.set(0, 800);
+        angle = angleLaunch;
         moving = true;
     }
 
