@@ -7,6 +7,8 @@ import flixel.FlxState;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import haxe.Timer;
+import flixel.tile.FlxTileblock;
+import openfl.display.BitmapData;
 
 // TODO: Add Sprites and all that stuff
 class PlayState extends FlxState
@@ -24,7 +26,10 @@ class PlayState extends FlxState
 	var player2:Player2;
 
 	@:allow(Misile)
-	var ground:Ground;
+	//var ground:Ground;
+	var terrain:Terrain;
+	var terrainBlocks:Array<FlxTileblock> = [];
+
 	var misile:Misile;
 	var explosionSprite:FlxSprite;
 
@@ -53,10 +58,37 @@ class PlayState extends FlxState
 		sky = new FlxSprite(0, 0);
 		sky.loadGraphic("assets/images/sky.jpg", false, FlxG.width, FlxG.height);
 
-		player = new Player(50, 252);
+		player = new Player(50, 242);
 		player2 = new Player2(530, 250);
 
-		ground = new Ground(0, 0);
+		terrain = new Terrain(0, 0);
+		//ground = new Ground(0, 281);
+		/*terrain = new FlxSprite(0, 0, "assets/images/Terrain.png");
+		var bmp:BitmapData = terrain.pixels;
+		var columnSize = 4;
+		for (x in 0...Std.int(bmp.width / columnSize)) {
+            var px = x * columnSize;
+            var groundY:Int = -1;
+
+            for (y in 0...bmp.height) {
+                var color = bmp.getPixel32(px, y);
+                if (((color >> 24) & 0xFF) > 0) { // alfa > 0 = terreno
+                    groundY = y;
+                    break;
+                }
+            }
+
+            if (groundY != -1) {
+                var block = new FlxTileblock(px, groundY, columnSize, bmp.height - groundY);
+                block.makeGraphic(columnSize, bmp.height - groundY, FlxColor.TRANSPARENT);
+                block.immovable = true;
+                block.visible = false; // invisible, usamos el PNG original para dibujar
+                add(block);
+                terrainBlocks.push(block);
+            }
+        }
+		*/
+
 		misile = new Misile();
 		explosionSprite = new FlxSprite(player.x, player.y);
 		explosionSprite.visible = false;
@@ -86,8 +118,8 @@ class PlayState extends FlxState
 		rightWall.makeGraphic(10, 1000, FlxColor.GREEN);
 		leftWall = new FlxSprite(0, FlxG.height - 1000);
 		leftWall.makeGraphic(10, 1000, FlxColor.GREEN);
-
-		add(sky);
+        add(terrain);
+		//add(sky);
 
 		add(misile);
 
@@ -95,7 +127,7 @@ class PlayState extends FlxState
 		add(indicator2);
 		add(misileIndicator);
 
-		add(ground);
+		//add(ground);
 
 		add(player);
 		add(player2);
@@ -155,7 +187,7 @@ class PlayState extends FlxState
 			player2.life -= 20;
 		}
 
-		ground.destroyTerrain(explosionSprite.x, explosionSprite.y, radius);
+		//ground.destroyTerrain(explosionSprite.x, explosionSprite.y, radius);
 
 		if ((player.life <= 0 || player2.life <= 0) && !isPlayerExplosion) {
 			die();
@@ -208,6 +240,12 @@ class PlayState extends FlxState
 		// TODO: Go to main menu
 	}
 
+	function collision():Void {
+		for (block in terrainBlocks) {
+            FlxG.collide(player, block);
+        }
+	}
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
@@ -215,6 +253,8 @@ class PlayState extends FlxState
 		updateIndicator();
 
 		misile.acceleration.x = wind;
+
+		// Make the misile always point forward in the parable
 		misile.angle = Math.atan2(misile.velocity.y, misile.velocity.x) * 180 / Math.PI + 90;
 	}
 }

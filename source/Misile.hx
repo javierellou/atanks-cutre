@@ -1,8 +1,8 @@
 package;
 
 import flixel.FlxG;
-import flixel.util.FlxCollision;
 import flixel.FlxSprite;
+import flixel.util.FlxCollision;
 // TODO: make the rotation
 class Misile extends FlxSprite {
     var playstate:PlayState = cast flixel.FlxG.state;
@@ -31,12 +31,17 @@ class Misile extends FlxSprite {
     }
 
     function parable() {
-        if (FlxCollision.pixelPerfectCheck(this, playstate.ground)) {
+		// TODO: Tilemap collision
+		if (x < Terrain.colision) {
+            trace("overlap");
+            /*
             cast(FlxG.state, PlayState).explode(_radius);
             moving = false;
             velocity.set(0, 0);
             acceleration.set(0, 0);
+            */
         }
+        
         
         if (FlxCollision.pixelPerfectCheck(this, playstate.leftWall) || FlxCollision.pixelPerfectCheck(this, playstate.rightWall)) {
             velocity.x *= -1;

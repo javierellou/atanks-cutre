@@ -62,6 +62,5 @@ class Player extends FlxSprite {
     override function update(elapsed:Float) {
         super.update(elapsed);
         ajustAndSend();
-        trace(playstate.turn);
     }
 }

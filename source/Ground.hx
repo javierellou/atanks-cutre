@@ -11,11 +11,13 @@ class Ground extends FlxSprite {
         super(x, y);
 
         //makeGraphic(640, 300, FlxColor.PURPLE);
-        if (map == 0) {
-            loadGraphic("assets/images/Terrain1.png");
+        /*
+        if (map == 0 || map == 1) {
+            loadGraphic("assets/images/Terrain1(1).png");
         } else {
             loadGraphic("assets/images/Terrain2.png");
         }
+        */
     }
 
     public function destroyTerrain(x, y, radius) {
