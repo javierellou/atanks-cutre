@@ -5,11 +5,10 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.display.BitmapData;
 
-@:allow(Misile)
 class Terrain extends FlxSprite {
     var perlin:Perlin = new Perlin();
     var terrainData:BitmapData = new BitmapData(FlxG.width, FlxG.height, true);
-    var collision:Array<Int>;
+    var collision:Array<Int> = [];
 
     public function new(x, y) {
         super(x, y);
@@ -28,11 +27,17 @@ class Terrain extends FlxSprite {
                 for(n in 0...skips)
                 terrainData.setPixel32(x+n, y, FlxColor.MAGENTA);
             }
-            for (n in 0...skips)
+            for (n in 0...skips) {
                 collision.push(Std.int(noiseFloat));
+                terrainData.setPixel32(x+n, Std.int(noiseFloat), FlxColor.GREEN);
+            }
             a++;
             trace(x, noiseFloat);
             loadGraphic(terrainData);
         }
+    }
+
+    public function giveCollision():Array<Int> {
+        return collision;
     }
 }
