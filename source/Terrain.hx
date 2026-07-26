@@ -8,7 +8,7 @@ import openfl.display.BitmapData;
 class Terrain extends FlxSprite {
     var perlin:Perlin = new Perlin();
     var terrainData:BitmapData = new BitmapData(FlxG.width, FlxG.height, true);
-    var collision:Array<Int> = [];
+    var collision:haxe.ds.Vector<Int> = new haxe.ds.Vector(FlxG.width);
 
     public function new(x, y) {
         super(x, y);
@@ -28,7 +28,7 @@ class Terrain extends FlxSprite {
                 terrainData.setPixel32(x+n, y, FlxColor.MAGENTA);
             }
             for (n in 0...skips) {
-                collision.push(Std.int(noiseFloat));
+                collision[x+n] = Std.int(noiseFloat);
                 terrainData.setPixel32(x+n, Std.int(noiseFloat), FlxColor.GREEN);
             }
             a++;
@@ -37,7 +37,7 @@ class Terrain extends FlxSprite {
         }
     }
 
-    public function giveCollision():Array<Int> {
+    public function giveCollision():haxe.ds.Vector<Int> {
         return collision;
     }
 }

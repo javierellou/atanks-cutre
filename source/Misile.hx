@@ -8,7 +8,7 @@ class Misile extends FlxSprite {
     var playstate:PlayState = cast flixel.FlxG.state;
     var moving:Bool = false;
     var _radius:Int;
-    var collision:Array<Int>;
+    var collision:haxe.ds.Vector<Int>;
 
     public function new(x:Float = -50, y:Float = -50) {
         super(x, y);
@@ -33,8 +33,7 @@ class Misile extends FlxSprite {
     }
 
     function parable() {
-		// TODO: Tilemap collision
-		if (x > collision[Std.int(x)]) {
+		if (y > collision[Std.int(x)]) {
             trace("overlap");
             cast(FlxG.state, PlayState).explode(_radius);
             moving = false;
