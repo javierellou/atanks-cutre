@@ -925,7 +925,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "9";
+	app.meta.h["build"] = "12";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "atanks-cutre";
 	app.meta.h["name"] = "atanks-cutre";
@@ -7518,6 +7518,7 @@ var Misile = function(x,y) {
 	flixel_FlxSprite.call(this,x,y);
 	this.loadGraphic("assets/images/misile.png",false,10,20);
 	this.drag.set_x(this.drag.set_y(400));
+	this.collision = this.playstate.terrain.giveCollision();
 };
 $hxClasses["Misile"] = Misile;
 Misile.__name__ = "Misile";
@@ -7526,6 +7527,7 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 	playstate: null
 	,moving: null
 	,_radius: null
+	,collision: null
 	,launch: function(power,angleLaunch,radiusExplosion,_x,_y) {
 		this.set_x(_x);
 		this.set_y(_y);
@@ -7558,8 +7560,33 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 		this.moving = true;
 	}
 	,parable: function() {
-		if(flixel_FlxG.overlap(this,this.playstate.terrain)) {
-			haxe_Log.trace("overlap",{ fileName : "source/Misile.hx", lineNumber : 38, className : "Misile", methodName : "parable"});
+		if(this.y > this.collision[this.x | 0]) {
+			haxe_Log.trace("overlap",{ fileName : "source/Misile.hx", lineNumber : 37, className : "Misile", methodName : "parable"});
+			this.set_y(this.collision[this.x | 0]);
+			(js_Boot.__cast(flixel_FlxG.game._state , PlayState)).explode(this._radius);
+			this.moving = false;
+			var this1 = this.velocity;
+			var x = 0;
+			var y = 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
+			var this1 = this.acceleration;
+			var x = 0;
+			var y = 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
 		}
 		if(flixel_util_FlxCollision.pixelPerfectCheck(this,this.playstate.leftWall) || flixel_util_FlxCollision.pixelPerfectCheck(this,this.playstate.rightWall)) {
 			this.velocity.set_x(this.velocity.x * -1);
@@ -7573,6 +7600,164 @@ Misile.prototype = $extend(flixel_FlxSprite.prototype,{
 	}
 	,__class__: Misile
 });
+var Gradient = function(x,y,z) {
+	this.x = x;
+	this.y = y;
+	this.z = z;
+};
+$hxClasses["Gradient"] = Gradient;
+Gradient.__name__ = "Gradient";
+Gradient.prototype = {
+	x: null
+	,y: null
+	,z: null
+	,dot2: function(x,y) {
+		return this.x * x + this.y * y;
+	}
+	,dot3: function(x,y,z) {
+		return this.x * x + this.y * y + this.z * z;
+	}
+	,__class__: Gradient
+};
+var Perlin = function(seed) {
+	this.perm = [];
+	this.gradP = [];
+	var _g = 0;
+	while(_g < 512) {
+		var i = _g++;
+		this.perm.push(0);
+		this.gradP.push(null);
+	}
+	if(seed == null) {
+		seed = Math.random() * 65536 | 0;
+	}
+	seed %= 65536;
+	if(seed < 256) {
+		seed |= seed << 8;
+	}
+	var v;
+	var _g = 0;
+	while(_g < 256) {
+		var i = _g++;
+		if((i & 1) == 1) {
+			v = Perlin.P[i] ^ seed & 255;
+		} else {
+			v = Perlin.P[i] ^ seed >> 8 & 255;
+		}
+		var tmp = this.perm[i + 256] = v;
+		this.perm[i] = tmp;
+		var tmp1 = this.gradP[i + 256] = Perlin.GRAD3[v % 12];
+		this.gradP[i] = tmp1;
+	}
+};
+$hxClasses["Perlin"] = Perlin;
+Perlin.__name__ = "Perlin";
+Perlin.prototype = {
+	perm: null
+	,gradP: null
+	,fade: function(t) {
+		return t * t * t * (t * (t * 6 - 15) + 10);
+	}
+	,lerp: function(a,b,t) {
+		return (1 - t) * a + t * b;
+	}
+	,n2d: function(x,y) {
+		var X = Math.floor(x);
+		var Y = Math.floor(y);
+		x -= X;
+		y -= Y;
+		X &= 255;
+		Y &= 255;
+		var n00 = this.gradP[X + this.perm[Y]].dot2(x,y);
+		var n01 = this.gradP[X + this.perm[Y + 1]].dot2(x,y - 1);
+		var n10 = this.gradP[X + 1 + this.perm[Y]].dot2(x - 1,y);
+		var n11 = this.gradP[X + 1 + this.perm[Y + 1]].dot2(x - 1,y - 1);
+		var u = this.fade(x);
+		var result = this.lerp(this.lerp(n00,n10,u),this.lerp(n01,n11,u),this.fade(y));
+		return result / (Math.sqrt(2) * 0.5);
+	}
+	,n3d: function(x,y,z) {
+		var X = Math.floor(x);
+		var Y = Math.floor(y);
+		var Z = Math.floor(z);
+		x -= X;
+		y -= Y;
+		z -= Z;
+		X &= 255;
+		Y &= 255;
+		Z &= 255;
+		var n000 = this.gradP[X + this.perm[Y + this.perm[Z]]].dot3(x,y,z);
+		var n001 = this.gradP[X + this.perm[Y + this.perm[Z + 1]]].dot3(x,y,z - 1);
+		var n010 = this.gradP[X + this.perm[Y + 1 + this.perm[Z]]].dot3(x,y - 1,z);
+		var n011 = this.gradP[X + this.perm[Y + 1 + this.perm[Z + 1]]].dot3(x,y - 1,z - 1);
+		var n100 = this.gradP[X + 1 + this.perm[Y + this.perm[Z]]].dot3(x - 1,y,z);
+		var n101 = this.gradP[X + 1 + this.perm[Y + this.perm[Z + 1]]].dot3(x - 1,y,z - 1);
+		var n110 = this.gradP[X + 1 + this.perm[Y + 1 + this.perm[Z]]].dot3(x - 1,y - 1,z);
+		var n111 = this.gradP[X + 1 + this.perm[Y + 1 + this.perm[Z + 1]]].dot3(x - 1,y - 1,z - 1);
+		var u = this.fade(x);
+		var v = this.fade(y);
+		var w = this.fade(z);
+		var result = this.lerp(this.lerp(this.lerp(n000,n100,u),this.lerp(n001,n101,u),w),this.lerp(this.lerp(n010,n110,u),this.lerp(n011,n111,u),w),v);
+		return result / (Math.sqrt(3) * 0.5);
+	}
+	,noise2d: function(x,y,octaves,amplitude,persistence,lacunarity) {
+		if(lacunarity == null) {
+			lacunarity = 2;
+		}
+		if(persistence == null) {
+			persistence = 0.9;
+		}
+		if(amplitude == null) {
+			amplitude = 1;
+		}
+		if(octaves == null) {
+			octaves = 1;
+		}
+		if(octaves == 1) {
+			return amplitude * this.n2d(x,y);
+		}
+		var sum = 0;
+		var _g = 0;
+		var _g1 = octaves;
+		while(_g < _g1) {
+			var i = _g++;
+			sum += amplitude * this.n2d(x,y);
+			amplitude *= persistence;
+			x *= lacunarity;
+			y *= lacunarity;
+		}
+		return sum;
+	}
+	,noise3d: function(x,y,z,octaves,amplitude,persistence,lacunarity) {
+		if(lacunarity == null) {
+			lacunarity = 2;
+		}
+		if(persistence == null) {
+			persistence = 0.9;
+		}
+		if(amplitude == null) {
+			amplitude = 1;
+		}
+		if(octaves == null) {
+			octaves = 1;
+		}
+		if(octaves == 1) {
+			return amplitude * this.n3d(x,y,z);
+		}
+		var sum = 0;
+		var _g = 0;
+		var _g1 = octaves;
+		while(_g < _g1) {
+			var i = _g++;
+			sum += amplitude * this.n3d(x,y,z);
+			amplitude *= persistence;
+			x *= lacunarity;
+			y *= lacunarity;
+		}
+		return sum;
+	}
+	,__class__: Perlin
+};
 var flixel_group_FlxTypedGroup = function(MaxSize) {
 	if(MaxSize == null) {
 		MaxSize = 0;
@@ -8322,7 +8507,6 @@ flixel_FlxState.prototype = $extend(flixel_group_FlxTypedContainer.prototype,{
 	,__properties__: $extend(flixel_group_FlxTypedContainer.prototype.__properties__,{get_subStateClosed:"get_subStateClosed",get_subStateOpened:"get_subStateOpened",set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
 });
 var PlayState = function() {
-	this.terrainBlocks = [];
 	this.wind = 0;
 	this.turn = "P1";
 	flixel_FlxState.call(this);
@@ -8336,7 +8520,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,player: null
 	,player2: null
 	,terrain: null
-	,terrainBlocks: null
+	,terrainCollision: null
 	,misile: null
 	,explosionSprite: null
 	,indicator: null
@@ -8354,36 +8538,14 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		flixel_FlxState.prototype.create.call(this);
 		this.sky = new flixel_FlxSprite(0,0);
 		this.sky.loadGraphic("assets/images/sky.jpg",false,flixel_FlxG.width,flixel_FlxG.height);
-		this.player = new Player(50,242);
-		this.player2 = new Player2(530,250);
-		this.terrain = new flixel_FlxSprite(0,0,"assets/images/Terrain.png");
-		var bmp = this.terrain.get_pixels();
-		var columnSize = 4;
-		var _g = 0;
-		var _g1 = bmp.width / columnSize | 0;
-		while(_g < _g1) {
-			var x = _g++;
-			var px = x * columnSize;
-			var groundY = -1;
-			var _g2 = 0;
-			var _g3 = bmp.height;
-			while(_g2 < _g3) {
-				var y = _g2++;
-				var color = bmp.getPixel32(px,y);
-				if((color >> 24 & 255) > 0) {
-					groundY = y;
-					break;
-				}
-			}
-			if(groundY != -1) {
-				var block = new flixel_tile_FlxTileblock(px,groundY,columnSize,bmp.height - groundY);
-				block.makeGraphic(columnSize,bmp.height - groundY,0);
-				block.set_immovable(true);
-				block.set_visible(false);
-				this.add(block);
-				this.terrainBlocks.push(block);
-			}
-		}
+		var randomPosition = Std.random(flixel_FlxG.width);
+		this.player = new Player(randomPosition,0);
+		randomPosition = Std.random(flixel_FlxG.width);
+		this.player2 = new Player2(randomPosition,0);
+		this.terrain = new Terrain(0,0);
+		this.terrainCollision = this.terrain.giveCollision();
+		this.player.set_y(this.terrainCollision[this.player.x | 0]);
+		this.player2.set_y(this.terrainCollision[this.player2.x | 0]);
 		this.misile = new Misile();
 		this.explosionSprite = new flixel_FlxSprite(this.player.x,this.player.y);
 		this.explosionSprite.set_visible(false);
@@ -8405,12 +8567,11 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.rightWall.makeGraphic(10,1000,-16744448);
 		this.leftWall = new flixel_FlxSprite(0,flixel_FlxG.height - 1000);
 		this.leftWall.makeGraphic(10,1000,-16744448);
-		this.add(this.sky);
+		this.add(this.terrain);
 		this.add(this.misile);
 		this.add(this.indicator);
 		this.add(this.indicator2);
 		this.add(this.misileIndicator);
-		this.add(this.terrain);
 		this.add(this.player);
 		this.add(this.player2);
 		this.add(this.explosionSprite);
@@ -8498,15 +8659,6 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			this.player2.destroy();
 			this.indicator2.destroy();
 			this.textP2Life.destroy();
-		}
-	}
-	,collision: function() {
-		var _g = 0;
-		var _g1 = this.terrainBlocks;
-		while(_g < _g1.length) {
-			var block = _g1[_g];
-			++_g;
-			flixel_FlxG.overlap(this.player,block,null,flixel_FlxObject.separate);
 		}
 	}
 	,update: function(elapsed) {
@@ -8899,6 +9051,60 @@ StringTools.hex = function(n,digits) {
 	}
 	return s;
 };
+var Terrain = function(x,y) {
+	this.collision = new Array(flixel_FlxG.width);
+	this.terrainData = new openfl_display_BitmapData(flixel_FlxG.width,flixel_FlxG.height,true);
+	this.perlin = new Perlin();
+	flixel_FlxSprite.call(this,x,y);
+	this.generateTerrain();
+};
+$hxClasses["Terrain"] = Terrain;
+Terrain.__name__ = "Terrain";
+Terrain.__super__ = flixel_FlxSprite;
+Terrain.prototype = $extend(flixel_FlxSprite.prototype,{
+	perlin: null
+	,terrainData: null
+	,collision: null
+	,generateTerrain: function() {
+		var a = 0;
+		var skips = Std.random(4) + 2;
+		var escale = Std.random(80);
+		var _g = 0;
+		var _g1 = flixel_FlxG.width;
+		while(_g < _g1) {
+			var x = _g++;
+			if(x % skips != 0) {
+				continue;
+			}
+			var noiseFloat = 300 + this.perlin.noise2d(a / 50,0,3,2) * escale;
+			var _g2 = noiseFloat | 0;
+			var _g3 = flixel_FlxG.height;
+			while(_g2 < _g3) {
+				var y = _g2++;
+				var _g4 = 0;
+				var _g5 = skips;
+				while(_g4 < _g5) {
+					var n = _g4++;
+					this.terrainData.setPixel32(x + n,y,-65281);
+				}
+			}
+			var _g6 = 0;
+			var _g7 = skips;
+			while(_g6 < _g7) {
+				var n1 = _g6++;
+				this.collision[x + n1] = noiseFloat | 0;
+				this.terrainData.setPixel32(x + n1,noiseFloat | 0,-16744448);
+			}
+			++a;
+			haxe_Log.trace(x,{ fileName : "source/Terrain.hx", lineNumber : 35, className : "Terrain", methodName : "generateTerrain", customParams : [noiseFloat]});
+			this.loadGraphic(this.terrainData);
+		}
+	}
+	,giveCollision: function() {
+		return this.collision;
+	}
+	,__class__: Terrain
+});
 var ValueType = $hxEnums["ValueType"] = { __ename__:"ValueType",__constructs__:null
 	,TNull: {_hx_name:"TNull",_hx_index:0,__enum__:"ValueType",toString:$estr}
 	,TInt: {_hx_name:"TInt",_hx_index:1,__enum__:"ValueType",toString:$estr}
@@ -76144,7 +76350,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 707629;
+	this.version = 788646;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -125053,6 +125259,8 @@ flixel_FlxObject._secondSeparateFlxRect = (function($this) {
 	return $r;
 }(this));
 flixel_FlxSprite.defaultAntialiasing = false;
+Perlin.GRAD3 = [new Gradient(1,1,0),new Gradient(-1,1,0),new Gradient(1,-1,0),new Gradient(-1,-1,0),new Gradient(1,0,1),new Gradient(-1,0,1),new Gradient(1,0,-1),new Gradient(-1,0,-1),new Gradient(0,1,1),new Gradient(0,-1,1),new Gradient(0,1,-1),new Gradient(0,-1,-1)];
+Perlin.P = [151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,190,6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180];
 Xml.Element = 0;
 Xml.PCData = 1;
 Xml.CData = 2;

@@ -7,10 +7,7 @@ import flixel.FlxState;
 import flixel.FlxSprite;
 import flixel.FlxG;
 import haxe.Timer;
-import flixel.tile.FlxTileblock;
-import openfl.display.BitmapData;
 
-// TODO: Add Sprites and all that stuff
 class PlayState extends FlxState
 {
 	public var turn:String = "P1"; 
@@ -25,10 +22,13 @@ class PlayState extends FlxState
 	var player:Player;
 	var player2:Player2;
 
+	
 	@:allow(Misile)
-	//var ground:Ground;
 	var terrain:Terrain;
-	var terrainBlocks:Array<FlxTileblock> = [];
+
+	@:allow(Player)
+	@:allow(Player2)
+	var terrainCollision:haxe.ds.Vector<Int>;
 
 	var misile:Misile;
 	var explosionSprite:FlxSprite;
@@ -37,14 +37,10 @@ class PlayState extends FlxState
 	var indicator2:FlxSprite;
 	var misileIndicator:FlxSprite; // It indicates where the misile is when it's out of the screen
 
-	@:allow(Misile)
-	var rightWall:FlxSprite;
-	@:allow(Misile)
-	var leftWall:FlxSprite;
-
 	var textPower:FlxText;
 	var textAngle:FlxText;
 	var textWind:FlxText;
+	var textFuel:FlxText;
 
 	var textP1Life:FlxText;
 	var textP2Life:FlxText;
@@ -57,38 +53,19 @@ class PlayState extends FlxState
 
 		sky = new FlxSprite(0, 0);
 		sky.loadGraphic("assets/images/sky.jpg", false, FlxG.width, FlxG.height);
-
-		player = new Player(50, 242);
-		player2 = new Player2(530, 250);
+		
+		var randomPosition:Float = Std.random(FlxG.width);
+		player = new Player(randomPosition, 0);
+		randomPosition = Std.random(FlxG.width);
+		player2 = new Player2(randomPosition, 0);
 
 		terrain = new Terrain(0, 0);
-		//ground = new Ground(0, 281);
-		/*terrain = new FlxSprite(0, 0, "assets/images/Terrain.png");
-		var bmp:BitmapData = terrain.pixels;
-		var columnSize = 4;
-		for (x in 0...Std.int(bmp.width / columnSize)) {
-            var px = x * columnSize;
-            var groundY:Int = -1;
-
-            for (y in 0...bmp.height) {
-                var color = bmp.getPixel32(px, y);
-                if (((color >> 24) & 0xFF) > 0) { // alfa > 0 = terreno
-                    groundY = y;
-                    break;
-                }
-            }
-
-            if (groundY != -1) {
-                var block = new FlxTileblock(px, groundY, columnSize, bmp.height - groundY);
-                block.makeGraphic(columnSize, bmp.height - groundY, FlxColor.TRANSPARENT);
-                block.immovable = true;
-                block.visible = false; // invisible, usamos el PNG original para dibujar
-                add(block);
-                terrainBlocks.push(block);
-            }
-        }
-		*/
-
+		terrainCollision = terrain.giveCollision();
+		player.y = terrainCollision[Std.int(player.x)]-6;
+		player.x -= 12;
+		player2.y = terrainCollision[Std.int(player2.x)]-6;
+		player.x -= 12;
+		
 		misile = new Misile();
 		explosionSprite = new FlxSprite(player.x, player.y);
 		explosionSprite.visible = false;
@@ -97,11 +74,12 @@ class PlayState extends FlxState
 		textPower = new FlxText(10, 10, 300, "Power: 0");
 		textAngle = new FlxText(10, 30, 300, "Angle: 0");
 		textWind = new FlxText(550, 10, 300, "Wind: 0");
+		textFuel = new FlxText(550, 30, 300, "Fuel: 100");
 		textP1Life = new FlxText(player.x, player.y - 10, 300, "100");
-		textP2Life = new FlxText(player2.x, player.y - 10, 300, "100");
+		textP2Life = new FlxText(player2.x, player2.y - 10, 300, "100");
 
 		textPower.color = textAngle.color = textWind.color = 
-		textP1Life.color = textP2Life.color = FlxColor.BLACK;
+		textP1Life.color = textP2Life.color = textFuel.color = FlxColor.BLACK;
 
 		randomWind();
 
@@ -112,12 +90,8 @@ class PlayState extends FlxState
 		indicator2.loadGraphic(AssetPaths.Indicator__png, false, 5, 40);
 
 		misileIndicator = new FlxSprite(0, 20);
-		misileIndicator.makeGraphic(18, 18, FlxColor.WHITE);
+		misileIndicator.makeGraphic(18, 18, FlxColor.BLACK);
 
-		rightWall = new FlxSprite(FlxG.width - 10, FlxG.height - 1000);
-		rightWall.makeGraphic(10, 1000, FlxColor.GREEN);
-		leftWall = new FlxSprite(0, FlxG.height - 1000);
-		leftWall.makeGraphic(10, 1000, FlxColor.GREEN);
         add(terrain);
 		//add(sky);
 
@@ -134,14 +108,12 @@ class PlayState extends FlxState
 
 		add(explosionSprite);
 
-		add(rightWall);
-		add(leftWall);
-
 		add(textWind);
 		add(textAngle);
 		add(textPower);
 		add(textP1Life);
 		add(textP2Life);
+		add(textFuel);
 	}
 
 	public function triggerLaunch(_power:Int, _angle:Int):Void {
@@ -155,9 +127,11 @@ class PlayState extends FlxState
 		if (turn == "P1") {
 			textPower.text = "Power: " + Std.string(player.powerAdjust);
 			textAngle.text = "Angle: " + Std.string(player.angleAdjust);
+			textFuel.text = "Fuel: " + Std.string(player.fuel);
 		} else if (turn == "P2") {
 			textPower.text = "Power: " + Std.string(player2.powerAdjust2);
 			textAngle.text = "Angle: " + Std.string(player2.angleAdjust2);
+			textFuel.text = "Fuel: " + Std.string(player2.fuel);
 		}
 
 		textP1Life.text = Std.string(player.life);
@@ -208,6 +182,8 @@ class PlayState extends FlxState
 	function updateIndicator():Void {
 		indicator.angle = player.angleAdjust * -1 + 90;
 		indicator2.angle = player2.angleAdjust2 * -1 + 90;
+		indicator.setPosition(player.x + 24, player.y - 11);
+		indicator2.setPosition(player2.x + 10, player2.y -15);
 		if (misile.y < 0) {
 			misileIndicator.visible = true;
 			misileIndicator.x = misile.x;
@@ -238,12 +214,6 @@ class PlayState extends FlxState
 		}
 
 		// TODO: Go to main menu
-	}
-
-	function collision():Void {
-		for (block in terrainBlocks) {
-            FlxG.collide(player, block);
-        }
 	}
 
 	override public function update(elapsed:Float)

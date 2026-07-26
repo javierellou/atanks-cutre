@@ -12,12 +12,16 @@ class Player2 extends FlxSprite {
     var decreasePower2:Bool = false;
     var fire2:Bool = false;
 
+    var moveright2:Bool = false;
+    var moveleft2:Bool = false;
+
     @:allow(PlayState)
     var angleAdjust2:Int = 90;
     @:allow(PlayState)
     var powerAdjust2:Int = 1000;
 
     public var life = 100;
+    public var fuel = 100;
 
     public function new(x:Float, y:Float) {
         super(x, y);
@@ -32,6 +36,8 @@ class Player2 extends FlxSprite {
         increasePower2 = FlxG.keys.pressed.UP;
         decreasePower2 = FlxG.keys.pressed.DOWN;
         fire2 = FlxG.keys.pressed.SPACE;
+        moveright2 = FlxG.keys.justPressed.E;
+        moveleft2 = FlxG.keys.justPressed.Q;
 
         if (playstate.turn == "P2") {
             if (increaseAngle2 && (0 <= angleAdjust2 && angleAdjust2 <= 180)) {
@@ -52,6 +58,18 @@ class Player2 extends FlxSprite {
 
             if (fire2) {
                 cast(FlxG.state, PlayState).triggerLaunch(powerAdjust2, angleAdjust2);
+            }
+
+            if (moveleft2) {
+                x -= 2;
+                y = playstate.terrainCollision[Std.int(x)+12]-6;
+                fuel--;
+            }
+
+            if (moveright2) {
+                x += 2;
+                y = playstate.terrainCollision[Std.int(x)+12]-6;
+                fuel--;
             }
         }
     }

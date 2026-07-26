@@ -7,19 +7,25 @@ import PlayState;
 
 class Player extends FlxSprite {
     var playstate:PlayState = cast flixel.FlxG.state;
+
     var increaseAngle:Bool = false;
     var decreaseAngle:Bool = false;
     
     var increasePower:Bool = false;
     var decreasePower:Bool = false;
 
+    var moveleft:Bool = false;
+    var moveright:Bool = false;
+
     var fire:Bool = false;
+
     @:allow(PlayState)
     var angleAdjust:Int = 90;
     @:allow(PlayState)
     var powerAdjust:Int = 1000;
 
     public var life = 100;
+    public var fuel = 100;
 
     public function new(x:Float, y:Float) {
         super(x, y);
@@ -34,6 +40,8 @@ class Player extends FlxSprite {
         increasePower = FlxG.keys.pressed.UP;
         decreasePower = FlxG.keys.pressed.DOWN;
         fire = FlxG.keys.pressed.SPACE;
+        moveright = FlxG.keys.justPressed.E;
+        moveleft = FlxG.keys.justPressed.Q;
 
         if (playstate.turn == "P1") {
             if (increaseAngle && (0 <= angleAdjust && angleAdjust <= 180)) {
@@ -54,6 +62,20 @@ class Player extends FlxSprite {
 
             if (fire) {
                 cast(FlxG.state, PlayState).triggerLaunch(powerAdjust, angleAdjust);
+            }
+
+            if (fuel > 0) {
+                if (moveleft && fuel > 0) {
+                    x -= 2;
+                    y = playstate.terrainCollision[Std.int(x)+12]-6;
+                    fuel--;
+                }
+
+                if (moveright && fuel > 0) {
+                    x += 2;
+                    y = playstate.terrainCollision[Std.int(x)+12]-6;
+                    fuel--;
+                }
             }
         }
         

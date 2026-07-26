@@ -2,8 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.util.FlxCollision;
-// TODO: make the rotation
+
 class Misile extends FlxSprite {
     var playstate:PlayState = cast flixel.FlxG.state;
     var moving:Bool = false;
@@ -32,9 +31,10 @@ class Misile extends FlxSprite {
         moving = true;
     }
 
-    function parable() {
+    function check() {
 		if (y > collision[Std.int(x)]) {
             trace("overlap");
+            y = collision[Std.int(x)];
             cast(FlxG.state, PlayState).explode(_radius);
             moving = false;
             velocity.set(0, 0);
@@ -42,7 +42,7 @@ class Misile extends FlxSprite {
         }
         
         
-        if (FlxCollision.pixelPerfectCheck(this, playstate.leftWall) || FlxCollision.pixelPerfectCheck(this, playstate.rightWall)) {
+        if (x > FlxG.width || x < 0) {
             velocity.x *= -1;
         }
     }
@@ -50,7 +50,7 @@ class Misile extends FlxSprite {
     override function update(elapsed:Float) {
         super.update(elapsed);
         if (moving) {
-            parable();
+            check();
         }
     }
 }
