@@ -65,15 +65,15 @@ class Player extends FlxSprite {
             }
 
             if (fuel > 0) {
-                if (moveleft && fuel > 0) {
+                if (moveleft) {
                     x -= 2;
-                    y = playstate.terrainCollision[Std.int(x)+12]-6;
+                    y = playstate.terrainCollision[Std.int(x)+12]-10;
                     fuel--;
                 }
 
-                if (moveright && fuel > 0) {
+                if (moveright) {
                     x += 2;
-                    y = playstate.terrainCollision[Std.int(x)+12]-6;
+                    y = playstate.terrainCollision[Std.int(x)+12]-10;
                     fuel--;
                 }
             }

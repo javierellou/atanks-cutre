@@ -4,11 +4,14 @@ import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.display.BitmapData;
+import openfl.display.GradientType;
+import lime.graphics.Image;
 
 class Terrain extends FlxSprite {
     var perlin:Perlin = new Perlin();
     var terrainData:BitmapData = new BitmapData(FlxG.width, FlxG.height, true);
     var collision:haxe.ds.Vector<Int> = new haxe.ds.Vector(FlxG.width);
+    var background:Image = new Image();
 
     public function new(x, y) {
         super(x, y);
@@ -17,9 +20,11 @@ class Terrain extends FlxSprite {
     }
 
     function generateTerrain():Void {
+        terrainData.floodFill(0, 0, 0xFF3356FF);
+
         var a:Int = 0;
         var skips:Int = Std.random(4)+2;
-        var escale:Int = Std.random(80);
+        var escale:Int = Std.random(100);
         for (x in 0...FlxG.width) {
             if (x%skips != 0) continue;
             var noiseFloat:Float = 300 + (perlin.noise2d(a / 50, 0, 3, 2) * escale);
@@ -29,7 +34,7 @@ class Terrain extends FlxSprite {
             }
             for (n in 0...skips) {
                 collision[x+n] = Std.int(noiseFloat);
-                terrainData.setPixel32(x+n, Std.int(noiseFloat), FlxColor.GREEN);
+                // terrainData.setPixel32(x+n, Std.int(noiseFloat), FlxColor.GREEN);
             }
             a++;
             trace(x, noiseFloat);

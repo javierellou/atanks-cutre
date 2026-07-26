@@ -59,17 +59,18 @@ class Player2 extends FlxSprite {
             if (fire2) {
                 cast(FlxG.state, PlayState).triggerLaunch(powerAdjust2, angleAdjust2);
             }
+            if (fuel > 0) {
+                if (moveleft2) {
+                    x -= 2;
+                    y = playstate.terrainCollision[Std.int(x)+12]-10;
+                    fuel--;
+                }
 
-            if (moveleft2) {
-                x -= 2;
-                y = playstate.terrainCollision[Std.int(x)+12]-6;
-                fuel--;
-            }
-
-            if (moveright2) {
-                x += 2;
-                y = playstate.terrainCollision[Std.int(x)+12]-6;
-                fuel--;
+                if (moveright2) {
+                    x += 2;
+                    y = playstate.terrainCollision[Std.int(x)+12]-10;
+                    fuel--;
+                }
             }
         }
     }

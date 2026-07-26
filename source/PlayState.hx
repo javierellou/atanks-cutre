@@ -73,8 +73,8 @@ class PlayState extends FlxState
 
 		textPower = new FlxText(10, 10, 300, "Power: 0");
 		textAngle = new FlxText(10, 30, 300, "Angle: 0");
-		textWind = new FlxText(550, 10, 300, "Wind: 0");
-		textFuel = new FlxText(550, 30, 300, "Fuel: 100");
+		textWind = new FlxText(FlxG.width - 70, 10, 300, "Wind: 0");
+		textFuel = new FlxText(FlxG.width - 70, 30, 300, "Fuel: 100");
 		textP1Life = new FlxText(player.x, player.y - 10, 300, "100");
 		textP2Life = new FlxText(player2.x, player2.y - 10, 300, "100");
 
