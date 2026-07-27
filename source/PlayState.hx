@@ -184,6 +184,9 @@ class PlayState extends FlxState
 		indicator2.angle = player2.angleAdjust2 * -1 + 90;
 		indicator.setPosition(player.x + 24, player.y - 11);
 		indicator2.setPosition(player2.x + 10, player2.y -15);
+		textP1Life.setPosition(player.x, player.y - 10);
+		textP2Life.setPosition(player2.x, player2.y - 10);
+
 		if (misile.y < 0) {
 			misileIndicator.visible = true;
 			misileIndicator.x = misile.x;

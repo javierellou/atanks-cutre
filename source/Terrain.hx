@@ -4,7 +4,6 @@ import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.display.BitmapData;
-import openfl.display.GradientType;
 import lime.graphics.Image;
 
 class Terrain extends FlxSprite {
@@ -20,7 +19,7 @@ class Terrain extends FlxSprite {
     }
 
     function generateTerrain():Void {
-        terrainData.floodFill(0, 0, 0xFF3356FF);
+        terrainData.floodFill(0, 0, 0xFF87B4DE);
 
         var a:Int = 0;
         var skips:Int = Std.random(4)+2;

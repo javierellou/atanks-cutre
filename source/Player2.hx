@@ -40,9 +40,15 @@ class Player2 extends FlxSprite {
         moveleft2 = FlxG.keys.justPressed.Q;
 
         if (playstate.turn == "P2") {
+            // Preventing the values to go over the limit
+            if (angleAdjust2 > 180) angleAdjust2 = 180;
+            else if (angleAdjust2 < 0) angleAdjust2 = 0;
             if (increaseAngle2 && (0 <= angleAdjust2 && angleAdjust2 <= 180)) {
                 angleAdjust2++;
             }
+
+            if (powerAdjust2 < 0) powerAdjust2 = 0;
+            else if (powerAdjust2 > 2000) powerAdjust2 = 2000;
 
             if (increasePower2 && (0 <= powerAdjust2 && powerAdjust2 <= 2000)) {
                 powerAdjust2 += 15;
