@@ -199,7 +199,7 @@ class PlayState extends FlxState
 		wind = Std.random(200) - 100;
 		textWind.text = "Wind: " + wind;
 
-		misile.acceleration.x = wind;
+		misile.acceleration.x = wind/10;
 	}
 
 	function die():Void {
