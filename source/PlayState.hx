@@ -17,6 +17,8 @@ class PlayState extends FlxState
 		"i2": Intermission and P2 next
     */
 
+	var loadingText:FlxText;
+
 	var wind:Float = 0;
 
 	var player:Player;
@@ -50,9 +52,6 @@ class PlayState extends FlxState
 	override public function create()
 	{
 		super.create();
-
-		sky = new FlxSprite(0, 0);
-		sky.loadGraphic("assets/images/sky.jpg", false, FlxG.width, FlxG.height);
 		
 		var randomPosition:Float = Std.random(FlxG.width);
 		player = new Player(randomPosition, 0);
