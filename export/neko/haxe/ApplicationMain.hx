@@ -19,7 +19,7 @@ class ApplicationMain
 		lime.system.System.__registerEntryPoint("atanks-cutre", create);
 
 		#if (js && html5)
-		#if (munit || utest)
+		#if (munit || (utest && openfl_enable_utest_legacy_mode))
 		lime.system.System.embed("atanks-cutre", null, 640, 480);
 		#end
 		#else
@@ -35,7 +35,7 @@ class ApplicationMain
 		ManifestResources.init(config);
 		#end
 
-		app.meta["build"] = "19";
+		app.meta["build"] = "20";
 		app.meta["company"] = "HaxeFlixel";
 		app.meta["file"] = "atanks-cutre";
 		app.meta["name"] = "atanks-cutre";
@@ -215,7 +215,11 @@ class ApplicationMain
 							stage.addChild(current);
 						}
 
+						//this define is for internal use only
+						//note: it may be removed abruptly in the future
+						#if !no_openfl_entry_point
 						new DocumentClass(cast current);
+						#end
 					};
 				}
 				else
