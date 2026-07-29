@@ -1,3 +1,5 @@
+export/neko/bin/assets/music/titleSong.ogg
+export/neko/bin/assets/music/titleSong.wav
 export/neko/bin/assets/music/music-goes-here.txt
 export/neko/bin/assets/data/data-goes-here.txt
 export/neko/bin/assets/sounds/sounds-go-here.txt

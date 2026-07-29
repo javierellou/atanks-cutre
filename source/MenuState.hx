@@ -12,8 +12,9 @@ class MenuState extends FlxState {
     override public function create() {
         super.create();
 
+        FlxG.sound.playMusic("assets/music/titleSong.ogg");
+
         background = new FlxSprite(0, 0, "assets/images/fondoinicio.png");
-        //button = new FlxButton(400, 200, "Play", clickPlay);
 
         button = new FlxSprite(400, 200, "assets/images/startButton.png");
         FlxMouseEvent.add(button, onDown, null, onOver, onOut);
@@ -23,6 +24,7 @@ class MenuState extends FlxState {
     }
 
     function onDown(button:FlxSprite):Void {
+      FlxG.sound.volume = 0;
       FlxG.switchState(PlayState.new);
     }
 
