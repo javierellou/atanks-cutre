@@ -1,16 +1,18 @@
 -main ApplicationMain 
+--macro keep('IntIterator')
+-cp /home/javierillo/haxelib/hscript/2,7,0
+-D hscript=2.7.0
+-cp /home/javierillo/haxelib/flixel-addons/4,0,1
+-D flixel-addons=4.0.1
 -cp /home/javierillo/haxelib/flixel/6,1,2
 -D flixel=6.1.2
---macro openfl.utils._internal.ExtraParamsMacro.include()
--cp /home/javierillo/haxelib/openfl/9,5,1/src
--D openfl=9.5.1
 --macro lime._internal.macros.DefineMacro.run()
 --macro haxe.macro.Compiler.addMetadata("@:autoBuild(lime._internal.macros.AssetsMacro.embedBytes())", "haxe.io.Bytes")
 -cp /home/javierillo/haxelib/lime/8,3,1/src
 -D lime=8.3.1
---macro keep('IntIterator')
--cp /home/javierillo/haxelib/hscript/2,7,0
--D hscript=2.7.0
+--macro openfl.utils._internal.ExtraParamsMacro.include()
+-cp /home/javierillo/haxelib/openfl/9,5,1/src
+-D openfl=9.5.1
 -cp source
 -D lime-openal
 -D message.reporting=pretty
@@ -24,6 +26,7 @@
 -D tools=8.3.1
 -D lime-cairo
 -D lime-threads-deque
+-D NAPE_NO_INLINE
 -D FLX_NO_DEBUG
 -D lime-opengl
 -D no-compilation

@@ -15,8 +15,11 @@ class MenuState extends FlxState {
         FlxG.sound.playMusic("assets/music/titleSong.ogg");
 
         background = new FlxSprite(0, 0, "assets/images/fondoinicio.png");
+        background.x += background.width/2;
+        background.y += background.height*0.75;
+        background.scale.set(2, 1.5);
 
-        button = new FlxSprite(400, 200, "assets/images/startButton.png");
+        button = new FlxSprite(800, 400, "assets/images/startButton.png");
         FlxMouseEvent.add(button, onDown, null, onOver, onOut);
 
         add(background);

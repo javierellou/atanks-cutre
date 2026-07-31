@@ -44,10 +44,12 @@ class PlayState extends FlxState
 	var textWind:FlxText;
 	var textFuel:FlxText;
 
-	var textP1Life:FlxText;
-	var textP2Life:FlxText;
+	public var textP1Life:FlxText;
+	public var textP2Life:FlxText;
 
 	var sky:FlxSprite;
+	var lifes:haxe.ds.Vector<Int> = new haxe.ds.Vector(2);
+	var isPlaying:Bool = true;
 
 	override public function create()
 	{
@@ -159,22 +161,16 @@ class PlayState extends FlxState
 		if (FlxCollision.pixelPerfectCheck(player2, explosionSprite)) {
 			player2.life -= 20;
 		}
-
-		//ground.destroyTerrain(explosionSprite.x, explosionSprite.y, radius);
-
-		if ((player.life <= 0 || player2.life <= 0) && !isPlayerExplosion) {
-			die();
-			return;
-		}
+		
 
         Timer.delay(() -> {
             explosionSprite.visible = false;
 			turn = (turn == "i1") ? "P1" : "P2";
 
-			randomWind();
+			if (isPlaying) randomWind(); // it's necessary to check if no one has died because if not, it crashes
+			if ((player.life <= 0 || player2.life <= 0) && !isPlayerExplosion) die();
         }, 2000);
 
-		
     }
 
 	// Update the angle of the indicator
@@ -202,7 +198,11 @@ class PlayState extends FlxState
 	}
 
 	function die():Void {
+		isPlaying = false;
 		var whoDied:FlxSprite = (player.life == 0) ? player : player2;
+		// pushing the lifes of the players to determine who won on DeathState
+		lifes[0] = player.life;
+		lifes[1] = player2.life;
 
 		explode(100, true);
 		if (whoDied == player) {
@@ -215,7 +215,11 @@ class PlayState extends FlxState
 			textP2Life.destroy();
 		}
 
-		// TODO: Go to main menu
+		FlxG.switchState(DeathState.new);
+	}
+
+	public function sendPlayersLife():haxe.ds.Vector<Int> {
+		return lifes;
 	}
 
 	override public function update(elapsed:Float)
