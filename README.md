@@ -1,4 +1,4 @@
-# atanks-cutre
+# cool-tanks
 This is a recreation of the game atomic tanks, but made with haxe-flixel
 <img src="https://raw.githubusercontent.com/javierellou/atanks-cutre/refs/heads/main/assets/images/preview.png">
 
