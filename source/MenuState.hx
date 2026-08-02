@@ -8,6 +8,7 @@ import flixel.input.mouse.FlxMouseEvent;
 class MenuState extends FlxState {
     var background:FlxSprite;
     var button:FlxSprite;
+    var quit:FlxSprite;
 
     override public function create() {
         super.create();
@@ -22,10 +23,15 @@ class MenuState extends FlxState {
         button = new FlxSprite(800, 300, "assets/images/startButton.png");
         button.scale.set(2, 2);
         FlxMouseEvent.add(button, onDown, null, onOver, onOut);
+
+        quit = new FlxSprite(800, 400, "assets/images/quitButton.png");
+        quit.scale.set(2, 2);
+        FlxMouseEvent.add(quit, exitGame, null, onOver, onOut);
         
 
         add(background);
         add(button);
+        add(quit);
     }
 
     function onDown(button:FlxSprite):Void {
@@ -40,4 +46,8 @@ class MenuState extends FlxState {
 	  function onOut(button:FlxSprite):Void {
 		  button.scale.x = button.scale.y = 2.0;
 	  }
+
+    function exitGame(button:FlxSprite) {
+      flash.system.System.exit(0);
+    }
 }

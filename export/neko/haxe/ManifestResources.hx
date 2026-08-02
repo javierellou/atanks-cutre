@@ -96,11 +96,10 @@ import sys.FileSystem;
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_music_music_goes_here_txt extends null { }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_data_data_goes_here_txt extends null { }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_sounds_sounds_go_here_txt extends null { }
-@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_sounds_explosion_mp3 extends null { }
-@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_sounds_launch_mp3 extends null { }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_sounds_explosion_wav extends null { }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_startbutton_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_images_go_here_txt extends null { }
+@:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_quitbutton_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_fondoinicio_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_player1_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
 @:keep @:bind @:noCompletion #if display private #end class __ASSET__assets_images_player2_png extends flash.display.BitmapData { public function new () { super (0, 0, true, 0); } }
