@@ -16,26 +16,28 @@ class MenuState extends FlxState {
 
         background = new FlxSprite(0, 0, "assets/images/fondoinicio.png");
         background.x += background.width/2;
-        background.y += background.height*0.75;
+        background.y += 120;
         background.scale.set(2, 1.5);
 
-        button = new FlxSprite(800, 400, "assets/images/startButton.png");
+        button = new FlxSprite(800, 300, "assets/images/startButton.png");
+        button.scale.set(2, 2);
         FlxMouseEvent.add(button, onDown, null, onOver, onOut);
+        
 
         add(background);
         add(button);
     }
 
     function onDown(button:FlxSprite):Void {
-      FlxG.sound.volume = 0;
+      FlxG.sound.pause();
       FlxG.switchState(PlayState.new);
     }
 
     function onOver(button:FlxSprite):Void {
-		button.scale.x = button.scale.y = 1.2;
+		  button.scale.x = button.scale.y = 2.2;
 	  }
 
 	  function onOut(button:FlxSprite):Void {
-		button.scale.x = button.scale.y = 1.0;
+		  button.scale.x = button.scale.y = 2.0;
 	  }
 }

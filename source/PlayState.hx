@@ -1,5 +1,6 @@
 package;
 
+import flixel.sound.FlxSound;
 import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
@@ -51,9 +52,13 @@ class PlayState extends FlxState
 	var lifes:haxe.ds.Vector<Int> = new haxe.ds.Vector(2);
 	var isPlaying:Bool = true;
 
+	var explosionSound:FlxSound;
+
 	override public function create()
 	{
 		super.create();
+
+		explosionSound = FlxG.sound.load(AssetPaths.explosion__wav);
 		
 		var randomPosition:Float = Std.random(FlxG.width);
 		player = new Player(randomPosition, 0);
@@ -140,6 +145,7 @@ class PlayState extends FlxState
 	}
 
 	public function explode(radius:Int, isPlayerExplosion:Bool = false):Void {
+		explosionSound.play();
         misile.velocity.x = misile.velocity.y = 0;
     	var diameter = radius * 2;
 

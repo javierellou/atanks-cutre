@@ -71,7 +71,7 @@ class DeathState extends FlxState {
     }
 
     function onDown(titleButton:FlxSprite):Void {
-      FlxG.sound.volume = 0;
+      FlxG.sound.resume();
       FlxG.switchState(MenuState.new);
     }
 

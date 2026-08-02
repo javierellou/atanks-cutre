@@ -3,6 +3,9 @@ export/neko/bin/assets/music/titleSong.wav
 export/neko/bin/assets/music/music-goes-here.txt
 export/neko/bin/assets/data/data-goes-here.txt
 export/neko/bin/assets/sounds/sounds-go-here.txt
+export/neko/bin/assets/sounds/explosion.mp3
+export/neko/bin/assets/sounds/launch.mp3
+export/neko/bin/assets/sounds/explosion.wav
 export/neko/bin/assets/images/startButton.png
 export/neko/bin/assets/images/images-go-here.txt
 export/neko/bin/assets/images/fondoinicio.png
