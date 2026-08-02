@@ -146,6 +146,7 @@ class PlayState extends FlxState
 
 	public function explode(radius:Int, isPlayerExplosion:Bool = false):Void {
 		explosionSound.play();
+		FlxG.camera.shake(0.005, 0.2);
         misile.velocity.x = misile.velocity.y = 0;
     	var diameter = radius * 2;
 

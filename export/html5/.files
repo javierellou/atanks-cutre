@@ -3,8 +3,10 @@ export/html5/bin/assets/music/titleSong.wav
 export/html5/bin/assets/music/music-goes-here.txt
 export/html5/bin/assets/data/data-goes-here.txt
 export/html5/bin/assets/sounds/sounds-go-here.txt
+export/html5/bin/assets/sounds/explosion.wav
 export/html5/bin/assets/images/startButton.png
 export/html5/bin/assets/images/images-go-here.txt
+export/html5/bin/assets/images/quitButton.png
 export/html5/bin/assets/images/fondoinicio.png
 export/html5/bin/assets/images/player1.png
 export/html5/bin/assets/images/player2.png
