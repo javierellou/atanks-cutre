@@ -2,7 +2,10 @@
 This is a recreation of the game atomic tanks, but made with haxe-flixel
 <img src="https://raw.githubusercontent.com/javierellou/cool-tanks/refs/heads/main/assets/images/preview.png">
 
-## How to play it
+## play online:
+[https://javierellou.github.io/cool-tanks/export/html5/bin/index.html](https://javierellou.github.io/cool-tanks/export/html5/bin/index.html)
+
+## How to test it
 First, you have to install [haxe](https://haxe.org/download/) and [haxe-flixel](https://haxeflixel.com/) in order to run the program.
 
 Then download the repo with `git clone https://github.com/javierellou/cool-tanks.git`
